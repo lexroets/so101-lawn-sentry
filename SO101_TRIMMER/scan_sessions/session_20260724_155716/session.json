@@ -1,0 +1,40 @@
+{
+  "session_id": "session_20260724_155716",
+  "status": "live",
+  "started": "2026-07-24T15:57:40",
+  "lawn_width_m": 3.5,
+  "lawn_length_m": 2.1,
+  "target_count": 3,
+  "targets": [
+    {
+      "target_id": 1,
+      "timestamp": "2026-07-24T15:57:17.779",
+      "x_m": 0.596,
+      "y_m": 0.783,
+      "confidence": 0.83,
+      "observations": 3,
+      "snapshot": "snapshots/target_001.jpg",
+      "status": "detected"
+    },
+    {
+      "target_id": 2,
+      "timestamp": "2026-07-24T15:57:35.517",
+      "x_m": 2.168,
+      "y_m": 0.565,
+      "confidence": 0.9007,
+      "observations": 3,
+      "snapshot": "snapshots/target_002.jpg",
+      "status": "detected"
+    },
+    {
+      "target_id": 3,
+      "timestamp": "2026-07-24T15:57:40.653",
+      "x_m": 0.591,
+      "y_m": 1.427,
+      "confidence": 0.8329,
+      "observations": 3,
+      "snapshot": "snapshots/target_003.jpg",
+      "status": "detected"
+    }
+  ]
+}

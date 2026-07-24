@@ -1,0 +1,407 @@
+# session started Wed Jul 22 11:43:46 2026
+SELFCHECK PASSED
+START rest_pose={2: 1322, 3: 2130, 4: 2654, 5: 1022} gain=0.9 deadband=3px latency=0.17s drop_frac=0.8 gripper=2050/1666
+GRIPPER TEST OK — opened to 2043
+Moving to rest pose {2: 1322, 3: 2130, 4: 2654, 5: 1022} + base forward centre...
+DETECT {'contours': 195, 'area_rej': 82, 'range_rej': 76, 'solidity_rej': 29, 'aspect_rej': 4, 'size_rej': 3, 'depth_rej': 1} targets=0 boxes=0 phase=IDLE
+DETECT {'contours': 274, 'area_rej': 125, 'range_rej': 105, 'solidity_rej': 36, 'size_rej': 3, 'aspect_rej': 5} targets=0 boxes=0 phase=IDLE
+DETECT {'contours': 141, 'size_rej': 9, 'area_rej': 85, 'aspect_rej': 8, 'range_rej': 30, 'solidity_rej': 9} targets=0 boxes=0 phase=IDLE
+[ml] nearest z=0.25 raw=('ryobi_lying', 0.49) -> cls=ryobi_lying conf=0.49 colour=ryobi lying=True ok=True
+DETECT {'contours': 292, 'area_rej': 123, 'size_rej': 31, 'range_rej': 90, 'solidity_rej': 42, 'aspect_rej': 4, 'accepted': 2} targets=1 boxes=0 phase=IDLE
+[ml] nearest z=0.25 raw=('pink_upright', 0.99) -> cls=pink_upright conf=0.99 colour=pink lying=False ok=True
+DETECT {'contours': 284, 'area_rej': 114, 'solidity_rej': 35, 'size_rej': 32, 'range_rej': 92, 'accepted': 7, 'aspect_rej': 4} targets=0 boxes=0 phase=IDLE
+[ml] nearest z=0.25 raw=('pink_upright', 0.94) -> cls=pink_upright conf=0.94 colour=pink lying=False ok=True
+DETECT {'contours': 258, 'area_rej': 105, 'accepted': 6, 'range_rej': 89, 'solidity_rej': 36, 'aspect_rej': 14, 'size_rej': 8} targets=0 boxes=0 phase=IDLE
+[ml] nearest z=0.25 raw=('pink_upright', 0.98) -> cls=pink_upright conf=0.98 colour=pink lying=False ok=True
+DETECT {'contours': 280, 'size_rej': 23, 'range_rej': 93, 'area_rej': 118, 'solidity_rej': 33, 'aspect_rej': 9, 'accepted': 4} targets=0 boxes=0 phase=IDLE
+[ml] nearest z=0.25 raw=('pink_upright', 0.98) -> cls=pink_upright conf=0.98 colour=pink lying=False ok=True
+DETECT {'contours': 271, 'area_rej': 112, 'accepted': 4, 'size_rej': 14, 'range_rej': 95, 'solidity_rej': 35, 'aspect_rej': 11} targets=0 boxes=0 phase=IDLE
+[ml] nearest z=0.25 raw=('pink_upright', 0.96) -> cls=pink_upright conf=0.96 colour=pink lying=False ok=True
+DETECT {'contours': 273, 'area_rej': 117, 'solidity_rej': 41, 'aspect_rej': 11, 'range_rej': 86, 'accepted': 4, 'size_rej': 14} targets=0 boxes=0 phase=IDLE
+DETECT {'contours': 292, 'size_rej': 51, 'area_rej': 108, 'range_rej': 73, 'solidity_rej': 49, 'aspect_rej': 6, 'accepted': 5} targets=0 boxes=0 phase=IDLE
+[ml] nearest z=0.25 raw=('pink_lying', 0.64) -> cls=pink_lying conf=0.64 colour=pink lying=True ok=True
+DETECT {'contours': 349, 'area_rej': 180, 'size_rej': 42, 'solidity_rej': 42, 'range_rej': 75, 'accepted': 4, 'aspect_rej': 6} targets=0 boxes=0 phase=IDLE
+[ml] nearest z=0.26 raw=('pink_lying', 0.45) -> cls=pink_lying conf=0.45 colour=pink lying=True ok=True
+DETECT {'contours': 311, 'area_rej': 142, 'size_rej': 29, 'range_rej': 96, 'solidity_rej': 38, 'aspect_rej': 5, 'accepted': 1} targets=0 boxes=0 phase=IDLE
+DETECT {'contours': 298, 'size_rej': 26, 'area_rej': 126, 'solidity_rej': 48, 'range_rej': 95, 'aspect_rej': 3} targets=0 boxes=0 phase=IDLE
+[ml] nearest z=0.26 raw=('pink_lying', 0.63) -> cls=pink_lying conf=0.63 colour=pink lying=True ok=True
+DETECT {'contours': 328, 'size_rej': 26, 'area_rej': 141, 'range_rej': 109, 'solidity_rej': 45, 'aspect_rej': 6, 'accepted': 1} targets=0 boxes=0 phase=IDLE
+DETECT {'contours': 326, 'size_rej': 40, 'area_rej': 147, 'range_rej': 98, 'solidity_rej': 30, 'aspect_rej': 9, 'accepted': 2} targets=0 boxes=0 phase=IDLE
+DETECT {'contours': 299, 'area_rej': 135, 'size_rej': 20, 'range_rej': 100, 'solidity_rej': 35, 'aspect_rej': 9} targets=0 boxes=0 phase=IDLE
+DETECT {'contours': 254, 'area_rej': 98, 'range_rej': 92, 'size_rej': 20, 'solidity_rej': 41, 'aspect_rej': 3} targets=0 boxes=0 phase=IDLE
+DETECT {'contours': 309, 'area_rej': 126, 'size_rej': 23, 'range_rej': 112, 'aspect_rej': 6, 'solidity_rej': 42} targets=0 boxes=0 phase=IDLE
+DETECT {'contours': 321, 'size_rej': 33, 'area_rej': 143, 'aspect_rej': 9, 'range_rej': 109, 'solidity_rej': 27} targets=0 boxes=0 phase=IDLE
+[ml] nearest z=0.23 raw=('background', 0.83) -> cls=background conf=0.83 colour=unknown lying=None ok=False
+DETECT {'contours': 361, 'area_rej': 171, 'solidity_rej': 43, 'size_rej': 40, 'range_rej': 95, 'aspect_rej': 8, 'accepted': 3, 'depth_rej': 1} targets=1 boxes=0 phase=IDLE
+DETECT {'contours': 301, 'area_rej': 118, 'size_rej': 22, 'range_rej': 112, 'solidity_rej': 39, 'aspect_rej': 8, 'accepted': 2} targets=0 boxes=0 phase=IDLE
+DETECT {'contours': 367, 'size_rej': 29, 'range_rej': 122, 'aspect_rej': 8, 'area_rej': 157, 'solidity_rej': 51} targets=0 boxes=0 phase=IDLE
+[ml] nearest z=0.25 raw=('pink_lying', 0.81) -> cls=pink_lying conf=0.81 colour=pink lying=True ok=True
+DETECT {'contours': 322, 'area_rej': 194, 'size_rej': 35, 'accepted': 4, 'solidity_rej': 35, 'range_rej': 46, 'aspect_rej': 8} targets=0 boxes=0 phase=IDLE
+DETECT {'contours': 254, 'size_rej': 11, 'area_rej': 128, 'range_rej': 78, 'solidity_rej': 32, 'aspect_rej': 5} targets=0 boxes=0 phase=IDLE
+DETECT {'contours': 283, 'area_rej': 114, 'depth_rej': 1, 'range_rej': 97, 'solidity_rej': 36, 'aspect_rej': 6, 'size_rej': 29} targets=0 boxes=0 phase=IDLE
+[ml] nearest z=0.25 raw=('ryobi_lying', 0.44) -> cls=ryobi_lying conf=0.44 colour=ryobi lying=True ok=True
+DETECT {'contours': 421, 'area_rej': 174, 'size_rej': 72, 'solidity_rej': 53, 'aspect_rej': 5, 'range_rej': 105, 'accepted': 11, 'depth_rej': 1} targets=1 boxes=0 phase=IDLE
+[ml] nearest z=0.26 raw=('ryobi_lying', 0.52) -> cls=ryobi_lying conf=0.52 colour=ryobi lying=True ok=True
+DETECT {'contours': 359, 'area_rej': 189, 'size_rej': 40, 'solidity_rej': 35, 'range_rej': 75, 'accepted': 11, 'aspect_rej': 8, 'depth_rej': 1} targets=1 boxes=0 phase=IDLE
+[ml] nearest z=0.27 raw=('ryobi_lying', 0.69) -> cls=ryobi_lying conf=0.69 colour=ryobi lying=True ok=True
+DETECT {'contours': 148, 'size_rej': 15, 'area_rej': 93, 'solidity_rej': 16, 'range_rej': 12, 'aspect_rej': 9, 'accepted': 3} targets=0 boxes=0 phase=IDLE
+[ml] nearest z=0.26 raw=('ryobi_lying', 0.55) -> cls=ryobi_lying conf=0.55 colour=ryobi lying=True ok=True
+DETECT {'contours': 390, 'area_rej': 192, 'solidity_rej': 46, 'accepted': 24, 'range_rej': 77, 'size_rej': 44, 'aspect_rej': 7} targets=2 boxes=0 phase=IDLE
+[ml] nearest z=0.25 raw=('pink_lying', 0.39) -> cls=pink_lying conf=0.39 colour=unknown lying=None ok=False
+DETECT {'contours': 302, 'area_rej': 126, 'size_rej': 21, 'solidity_rej': 37, 'range_rej': 94, 'accepted': 22, 'aspect_rej': 2} targets=2 boxes=0 phase=IDLE
+[ml] nearest z=0.26 raw=('ryobi_lying', 0.83) -> cls=ryobi_lying conf=0.83 colour=ryobi lying=True ok=True
+AUTO SORT started — ENTER again (mid-cycle) aborts
+AUTO TARGET (ryobi) z=0.260 len=30mm dark_px=2704 ryobi_px=2704 pink_px=0 src=depth
+GO — centring on target, goal=1854
+DETECT {'contours': 295, 'area_rej': 123, 'accepted': 23, 'range_rej': 91, 'solidity_rej': 40, 'size_rej': 13, 'aspect_rej': 5} targets=2 boxes=0 phase=CENTRE
+TRACK err=-135px goal=1844
+[ml] nearest z=0.27 raw=('ryobi_lying', 0.36) -> cls=ryobi_lying conf=0.36 colour=unknown lying=None ok=False
+TRACK err=-30px goal=1952
+TRACK err=-12px goal=1971
+TRACK err=-7px goal=1904
+TRACK err=-41px goal=1800
+TRACK err=-87px goal=1698
+DETECT {'contours': 347, 'area_rej': 187, 'solidity_rej': 41, 'range_rej': 71, 'accepted': 15, 'aspect_rej': 12, 'size_rej': 19, 'depth_rej': 2} targets=1 boxes=0 phase=CENTRE
+[ml] nearest z=0.26 raw=('ryobi_lying', 0.88) -> cls=ryobi_lying conf=0.88 colour=ryobi lying=True ok=True
+COLOUR VOTE ryobi=15 pink=0 -> ryobi
+ORIENTATION lying=10 upright=1 [src=yolo:battery_lying top=64mm h/w=0.88] -> LYING top-down (lying needs +2; L forces top-down)
+STAGE1 (blind — click point) t=0.80 goals={2: 2376, 3: 1551, 4: 2706, 5: 987} z=0.276
+RELEASE from phase STAGE1 — returning to rest
+DETECT {'contours': 386, 'area_rej': 204, 'size_rej': 27, 'accepted': 17, 'solidity_rej': 58, 'range_rej': 71, 'aspect_rej': 9} targets=1 boxes=0 phase=IDLE
+[ml] nearest z=0.32 raw=('ryobi_upright', 0.92) -> cls=ryobi_upright conf=0.92 colour=ryobi lying=False ok=True
+AUTO SORT started — ENTER again (mid-cycle) aborts
+AUTO TARGET (ryobi) z=0.264 len=39mm dark_px=2825 ryobi_px=2825 pink_px=0 src=depth
+GO — centring on target, goal=1853
+DETECT {'contours': 272, 'area_rej': 101, 'accepted': 20, 'range_rej': 94, 'solidity_rej': 29, 'size_rej': 21, 'aspect_rej': 6, 'depth_rej': 1} targets=1 boxes=0 phase=CENTRE
+TRACK err=-107px goal=1908
+[ml] nearest z=0.27 raw=('ryobi_lying', 0.73) -> cls=ryobi_lying conf=0.73 colour=ryobi lying=True ok=True
+TRACK err=-39px goal=2038
+TRACK err=-23px goal=1987
+DETECT {'contours': 318, 'area_rej': 143, 'accepted': 16, 'size_rej': 13, 'range_rej': 101, 'solidity_rej': 38, 'aspect_rej': 6, 'depth_rej': 1} targets=1 boxes=0 phase=CENTRE
+RELEASE from phase CENTRE — returning to rest
+[ml] nearest z=0.26 raw=('ryobi_lying', 0.86) -> cls=ryobi_lying conf=0.86 colour=ryobi lying=True ok=True
+DETECT {'contours': 287, 'area_rej': 127, 'accepted': 17, 'range_rej': 94, 'solidity_rej': 28, 'size_rej': 13, 'aspect_rej': 8} targets=1 boxes=0 phase=IDLE
+[ml] nearest z=0.26 raw=('ryobi_lying', 0.73) -> cls=ryobi_lying conf=0.73 colour=ryobi lying=True ok=True
+AUTO SORT started — ENTER again (mid-cycle) aborts
+AUTO TARGET (ryobi) z=0.260 len=37mm dark_px=2554 ryobi_px=2554 pink_px=0 src=depth
+GO — centring on target, goal=1845
+TRACK err=-133px goal=1853
+TRACK err=-87px goal=1955
+DETECT {'contours': 310, 'size_rej': 17, 'area_rej': 128, 'accepted': 21, 'solidity_rej': 22, 'range_rej': 117, 'aspect_rej': 4, 'depth_rej': 1} targets=1 boxes=0 phase=CENTRE
+TRACK err=-30px goal=2042
+[ml] nearest z=0.26 raw=('ryobi_lying', 0.65) -> cls=ryobi_lying conf=0.65 colour=ryobi lying=True ok=True
+DETECT {'contours': 281, 'area_rej': 126, 'size_rej': 10, 'accepted': 20, 'solidity_rej': 30, 'range_rej': 80, 'aspect_rej': 14, 'depth_rej': 1} targets=1 boxes=0 phase=CENTRE
+COLOUR VOTE ryobi=12 pink=0 -> ryobi
+ORIENTATION lying=7 upright=0 [src=yolo:battery_lying top=-4mm h/w=1.20] -> LYING top-down (lying needs +2; L forces top-down)
+STAGE1 (blind — click point) t=0.48 goals={2: 2388, 3: 1526, 4: 2735, 5: 1011} z=0.268
+[ml] nearest z=0.25 raw=('ryobi_lying', 0.88) -> cls=ryobi_lying conf=0.88 colour=ryobi lying=True ok=True
+RELEASE from phase STAGE1 — returning to rest
+DETECT {'contours': 288, 'area_rej': 123, 'size_rej': 4, 'accepted': 28, 'solidity_rej': 24, 'aspect_rej': 22, 'range_rej': 87} targets=2 boxes=0 phase=IDLE
+[ml] nearest z=0.26 raw=('ryobi_lying', 0.88) -> cls=ryobi_lying conf=0.88 colour=ryobi lying=True ok=True
+DETECT {'contours': 292, 'area_rej': 120, 'size_rej': 12, 'solidity_rej': 42, 'aspect_rej': 6, 'accepted': 15, 'range_rej': 97} targets=1 boxes=0 phase=IDLE
+[ml] nearest z=0.26 raw=('ryobi_lying', 0.88) -> cls=ryobi_lying conf=0.88 colour=ryobi lying=True ok=True
+AUTO SORT started — ENTER again (mid-cycle) aborts
+AUTO TARGET (ryobi) z=0.317 len=63mm dark_px=2629 ryobi_px=2629 pink_px=0 src=depth
+GO — centring on target, goal=2058
+TRACK err=+22px goal=2024
+TRACK err=+13px goal=2008
+TRACK err=+8px goal=2036
+TRACK err=+23px goal=2084
+TRACK err=-5px goal=2012
+DETECT {'contours': 300, 'area_rej': 129, 'accepted': 20, 'solidity_rej': 40, 'range_rej': 90, 'aspect_rej': 15, 'size_rej': 6} targets=2 boxes=0 phase=CENTRE
+TRACK err=-13px goal=2022
+TRACK err=-15px goal=2043
+TRACK err=+12px goal=2115
+TRACK err=+22px goal=2089
+TRACK err=+14px goal=2059
+[ml] nearest z=0.32 raw=('background', 0.37) -> cls=ryobi_upright conf=0.34 colour=unknown lying=None ok=False
+TRACK err=-20px goal=1977
+TRACK err=-19px goal=2022
+TRACK err=-5px goal=2074
+TRACK err=+13px goal=2032
+TRACK err=-5px goal=2044
+COLOUR VOTE ryobi=24 pink=0 -> ryobi
+ORIENTATION lying=0 upright=16 [src=top top=204mm h/w=2.18] -> upright (lying needs +2; L forces top-down)
+STAGE1 (blind — click point) t=0.65 goals={2: 2271, 3: 1981, 4: 1946, 5: 1022} z=0.323
+DETECT {'contours': 307, 'area_rej': 132, 'solidity_rej': 28, 'accepted': 24, 'range_rej': 94, 'size_rej': 13, 'aspect_rej': 16} targets=2 boxes=0 phase=STAGE1
+[ml] nearest z=0.26 raw=('ryobi_lying', 0.9) -> cls=ryobi_lying conf=0.90 colour=ryobi lying=True ok=True
+VERIFY — re-checking target position
+VERIFY_CORR err=+13px goal=2058
+DETECT {'contours': 292, 'area_rej': 120, 'accepted': 31, 'aspect_rej': 18, 'range_rej': 94, 'solidity_rej': 16, 'size_rej': 13} targets=2 boxes=0 phase=VERIFY
+[ml] nearest z=0.25 raw=('ryobi_lying', 0.88) -> cls=ryobi_lying conf=0.88 colour=ryobi lying=True ok=True
+VERIFY_CORR err=+6px goal=2056
+VERIFY_CORR err=+10px goal=2062
+DETECT {'contours': 372, 'area_rej': 154, 'accepted': 30, 'aspect_rej': 16, 'size_rej': 48, 'range_rej': 75, 'solidity_rej': 48, 'depth_rej': 1} targets=1 boxes=0 phase=VERIFY
+FULL goals={2: 2678, 3: 1917, 4: 1643, 5: 1022} (aligned)
+[ml] nearest z=0.23 raw=('background', 0.86) -> cls=background conf=0.86 colour=unknown lying=None ok=False
+ARM ARRIVED at reach pose
+DETECT {'contours': 385, 'area_rej': 179, 'size_rej': 66, 'accepted': 21, 'aspect_rej': 40, 'range_rej': 47, 'solidity_rej': 32} targets=0 boxes=0 phase=FULL
+GRIP closed at raw 1802
+DETECT {} targets=0 boxes=0 phase=GRIPPED
+P_CARRY — ryobi battery to the GREEN bucket
+DETECT {} targets=0 boxes=0 phase=P_CARRY
+P_SWING — base to drop point at 2482
+P_HOVER — positioning above the drop point
+DETECT {} targets=0 boxes=0 phase=P_HOVER
+P_INSERT — final approach
+DETECT {} targets=0 boxes=0 phase=P_INSERT
+AT DROP POINT — settling
+P_RELEASE — opening in the sleeve
+DETECT {} targets=0 boxes=0 phase=P_RELEASE
+P_RETREAT — rising clear of the slot
+DETECT {} targets=0 boxes=0 phase=P_RETREAT
+DETECT {} targets=0 boxes=0 phase=P_RETREAT
+DETECT {} targets=0 boxes=0 phase=P_RETREAT
+P_HOME — folding arm before the base swings
+DETECT {} targets=0 boxes=0 phase=P_HOME
+DETECT {} targets=0 boxes=0 phase=P_HOME
+PLACED — cycle complete (ryobi 1, pink 0)
+[ml] nearest z=0.27 raw=('ryobi_lying', 0.68) -> cls=ryobi_lying conf=0.68 colour=ryobi lying=True ok=True
+DETECT {'contours': 269, 'area_rej': 141, 'aspect_rej': 19, 'solidity_rej': 27, 'range_rej': 62, 'size_rej': 17, 'accepted': 3} targets=0 boxes=0 phase=IDLE
+AUTO TARGET (ryobi) z=0.272 len=31mm dark_px=2597 ryobi_px=2597 pink_px=0 src=depth
+GO — centring on target, goal=1812
+[ml] nearest z=0.26 raw=('ryobi_lying', 0.5) -> cls=ryobi_lying conf=0.50 colour=ryobi lying=True ok=True
+TRACK err=-127px goal=1910
+TRACK err=-54px goal=2055
+TRACK err=-23px goal=2010
+DETECT {'contours': 296, 'solidity_rej': 35, 'range_rej': 102, 'area_rej': 129, 'accepted': 11, 'aspect_rej': 9, 'size_rej': 10} targets=1 boxes=0 phase=CENTRE
+[ml] nearest z=0.25 raw=('ryobi_lying', 0.86) -> cls=ryobi_lying conf=0.86 colour=ryobi lying=True ok=True
+DETECT {'contours': 242, 'size_rej': 10, 'accepted': 3, 'area_rej': 109, 'range_rej': 84, 'solidity_rej': 35, 'aspect_rej': 1} targets=0 boxes=0 phase=CENTRE
+COLOUR VOTE ryobi=11 pink=1 -> ryobi
+ORIENTATION lying=5 upright=1 [src=yolo:battery_lying top=73mm h/w=1.16] -> LYING top-down (lying needs +2; L forces top-down)
+STAGE1 (blind — click point) t=0.48 goals={2: 2388, 3: 1526, 4: 2735, 5: 1011} z=0.268
+[ml] nearest z=0.26 raw=('ryobi_lying', 0.87) -> cls=ryobi_lying conf=0.87 colour=ryobi lying=True ok=True
+DETECT {'contours': 245, 'accepted': 11, 'area_rej': 117, 'range_rej': 78, 'solidity_rej': 29, 'size_rej': 7, 'aspect_rej': 3} targets=1 boxes=0 phase=STAGE1
+VERIFY — re-checking target position
+RELEASE from phase VERIFY — returning to rest
+DETECT {'contours': 325, 'area_rej': 151, 'size_rej': 31, 'solidity_rej': 37, 'range_rej': 81, 'accepted': 12, 'aspect_rej': 12, 'depth_rej': 1} targets=0 boxes=0 phase=IDLE
+[ml] nearest z=0.27 raw=('ryobi_lying', 0.69) -> cls=ryobi_lying conf=0.69 colour=ryobi lying=True ok=True
+DETECT {'contours': 277, 'area_rej': 123, 'accepted': 5, 'range_rej': 96, 'solidity_rej': 29, 'aspect_rej': 8, 'size_rej': 16} targets=0 boxes=0 phase=IDLE
+[ml] nearest z=0.27 raw=('ryobi_lying', 0.83) -> cls=ryobi_lying conf=0.83 colour=ryobi lying=True ok=True
+DETECT {'contours': 275, 'area_rej': 124, 'accepted': 3, 'range_rej': 91, 'solidity_rej': 33, 'aspect_rej': 6, 'size_rej': 18} targets=0 boxes=0 phase=IDLE
+[ml] nearest z=0.27 raw=('ryobi_lying', 0.84) -> cls=ryobi_lying conf=0.84 colour=ryobi lying=True ok=True
+DETECT {'contours': 241, 'area_rej': 107, 'size_rej': 12, 'solidity_rej': 26, 'range_rej': 89, 'aspect_rej': 5, 'accepted': 2} targets=0 boxes=0 phase=IDLE
+[ml] nearest z=0.27 raw=('ryobi_lying', 0.71) -> cls=ryobi_lying conf=0.71 colour=ryobi lying=True ok=True
+AUTO SORT started — ENTER again (mid-cycle) aborts
+DETECT {'contours': 269, 'area_rej': 128, 'solidity_rej': 22, 'range_rej': 88, 'size_rej': 15, 'aspect_rej': 10, 'accepted': 6} targets=1 boxes=0 phase=IDLE
+AUTO TARGET (ryobi) z=0.272 len=35mm dark_px=2728 ryobi_px=2728 pink_px=0 src=depth
+GO — centring on target, goal=1815
+[ml] nearest z=0.29 raw=('ryobi_lying', 0.51) -> cls=ryobi_lying conf=0.51 colour=ryobi lying=True ok=True
+TRACK err=-9px goal=1886
+TRACK err=-9px goal=1843
+TRACK err=-35px goal=1772
+TRACK err=-51px goal=1741
+TRACK err=-36px goal=1821
+TRACK err=+4px goal=1913
+TRACK err=+38px goal=1905
+TRACK err=+11px goal=1817
+DETECT {'contours': 329, 'area_rej': 135, 'solidity_rej': 56, 'range_rej': 101, 'accepted': 14, 'aspect_rej': 14, 'size_rej': 9} targets=1 boxes=0 phase=CENTRE
+TRACK err=-24px goal=1834
+TRACK err=-15px goal=1859
+TRACK err=-13px goal=1825
+[ml] nearest z=0.27 raw=('ryobi_lying', 0.54) -> cls=ryobi_lying conf=0.54 colour=ryobi lying=True ok=True
+TRACK err=-17px goal=1807
+TRACK err=-32px goal=1782
+TRACK err=-15px goal=1831
+TRACK err=-6px goal=1848
+TRACK err=+23px goal=1890
+TRACK err=-5px goal=1799
+TRACK err=-27px goal=1744
+TRACK err=-36px goal=1793
+COLOUR VOTE ryobi=29 pink=0 -> ryobi
+ORIENTATION lying=21 upright=2 [src=yolo:battery_lying top=78mm h/w=0.74] -> LYING top-down (lying needs +2; L forces top-down)
+STAGE1 (blind — click point) t=0.14 goals={2: 2361, 3: 1582, 4: 2676, 5: 957} z=0.286
+DETECT {'contours': 308, 'area_rej': 125, 'size_rej': 14, 'accepted': 17, 'solidity_rej': 46, 'range_rej': 86, 'aspect_rej': 19, 'depth_rej': 1} targets=1 boxes=0 phase=STAGE1
+[ml] nearest z=0.26 raw=('ryobi_lying', 0.92) -> cls=ryobi_lying conf=0.92 colour=ryobi lying=True ok=True
+DETECT {'contours': 238, 'solidity_rej': 30, 'area_rej': 95, 'size_rej': 17, 'accepted': 14, 'range_rej': 54, 'aspect_rej': 28} targets=1 boxes=0 phase=STAGE1
+VERIFY — re-checking target position
+VERIFY_CORR err=+24px goal=1814
+[ml] nearest z=0.27 raw=('ryobi_lying', 0.85) -> cls=ryobi_lying conf=0.85 colour=ryobi lying=True ok=True
+FULL goals={2: 2845, 3: 1267, 4: 2770, 5: 1006} (aligned)
+DETECT {'contours': 363, 'area_rej': 182, 'size_rej': 47, 'aspect_rej': 24, 'range_rej': 46, 'solidity_rej': 49, 'accepted': 15} targets=3 boxes=0 phase=FULL
+ARM ARRIVED at reach pose
+[ml] nearest z=0.26 raw=('background', 0.83) -> cls=background conf=0.83 colour=unknown lying=None ok=False
+GRIP closed at raw 1802
+DETECT {'contours': 176, 'area_rej': 93, 'size_rej': 36, 'solidity_rej': 20, 'range_rej': 11, 'accepted': 7, 'aspect_rej': 8, 'depth_rej': 1} targets=0 boxes=0 phase=GRIPPED
+P_CARRY — ryobi battery to the GREEN bucket
+DETECT {} targets=0 boxes=0 phase=P_CARRY
+P_SWING — base to drop point at 2482
+P_HOVER — positioning above the drop point
+DETECT {} targets=0 boxes=0 phase=P_HOVER
+P_INSERT — final approach
+DETECT {} targets=0 boxes=0 phase=P_INSERT
+AT DROP POINT — settling
+P_RELEASE — opening in the sleeve
+DETECT {} targets=0 boxes=0 phase=P_RELEASE
+P_RETREAT — rising clear of the slot
+DETECT {} targets=0 boxes=0 phase=P_RETREAT
+DETECT {} targets=0 boxes=0 phase=P_RETREAT
+DETECT {} targets=0 boxes=0 phase=P_RETREAT
+P_HOME — folding arm before the base swings
+DETECT {} targets=0 boxes=0 phase=P_HOME
+DETECT {} targets=0 boxes=0 phase=P_HOME
+PLACED — cycle complete (ryobi 2, pink 0)
+DETECT {'contours': 220, 'size_rej': 15, 'area_rej': 102, 'aspect_rej': 17, 'solidity_rej': 24, 'range_rej': 62} targets=0 boxes=0 phase=IDLE
+DETECT {'contours': 242, 'area_rej': 107, 'size_rej': 15, 'range_rej': 98, 'solidity_rej': 17, 'aspect_rej': 5} targets=0 boxes=0 phase=IDLE
+[ml] nearest z=0.22 raw=('ryobi_lying', 0.59) -> cls=ryobi_lying conf=0.59 colour=ryobi lying=True ok=True
+DETECT {'contours': 386, 'size_rej': 52, 'aspect_rej': 16, 'area_rej': 180, 'range_rej': 107, 'solidity_rej': 30, 'accepted': 1} targets=0 boxes=0 phase=IDLE
+[ml] nearest z=0.26 raw=('ryobi_lying', 0.81) -> cls=ryobi_lying conf=0.81 colour=ryobi lying=True ok=True
+SKIP phantom — no colour evidence (rc=0 pc=0) at z=0.235
+AUTO TARGET (ryobi) z=0.264 len=31mm dark_px=2883 ryobi_px=2883 pink_px=0 src=depth
+GO — centring on target, goal=1927
+TRACK err=-95px goal=1874
+DETECT {'contours': 352, 'size_rej': 33, 'area_rej': 150, 'solidity_rej': 32, 'range_rej': 119, 'accepted': 11, 'aspect_rej': 6, 'depth_rej': 1} targets=1 boxes=0 phase=CENTRE
+TRACK err=+22px goal=1935
+TRACK err=+19px goal=1909
+TRACK err=+28px goal=1925
+[ml] nearest z=0.26 raw=('ryobi_lying', 0.95) -> cls=ryobi_lying conf=0.95 colour=ryobi lying=True ok=True
+TRACK err=+7px goal=1877
+TRACK err=+12px goal=1930
+TRACK err=-9px goal=1883
+TRACK err=+24px goal=1961
+TRACK err=+15px goal=1907
+TRACK err=+10px goal=1896
+TRACK err=-17px goal=1845
+DETECT {'contours': 331, 'area_rej': 146, 'solidity_rej': 23, 'range_rej': 123, 'aspect_rej': 13, 'accepted': 16, 'size_rej': 10} targets=1 boxes=0 phase=CENTRE
+TRACK err=+50px goal=1916
+TRACK err=+44px goal=1893
+[ml] nearest z=0.26 raw=('ryobi_lying', 0.88) -> cls=ryobi_lying conf=0.88 colour=ryobi lying=True ok=True
+TRACK err=+32px goal=1873
+TRACK err=+27px goal=1907
+TRACK err=+8px goal=1870
+TRACK err=+19px goal=1908
+TRACK err=+20px goal=1918
+TRACK err=+15px goal=1890
+TRACK err=+19px goal=1926
+TRACK err=-4px goal=1873
+DETECT {'contours': 335, 'accepted': 15, 'range_rej': 98, 'area_rej': 168, 'solidity_rej': 33, 'size_rej': 7, 'aspect_rej': 14} targets=1 boxes=0 phase=CENTRE
+TRACK err=+9px goal=1909
+TRACK err=+27px goal=1950
+TRACK err=+14px goal=1924
+TRACK err=+20px goal=1913
+TRACK err=-10px goal=1866
+[ml] nearest z=0.26 raw=('ryobi_lying', 0.98) -> cls=ryobi_lying conf=0.98 colour=ryobi lying=True ok=True
+TRACK err=+4px goal=1909
+TRACK err=+5px goal=1940
+TRACK err=+16px goal=1948
+TRACK err=+22px goal=1921
+TRACK err=-12px goal=1863
+TRACK err=-13px goal=1873
+TRACK err=+16px goal=1942
+TRACK err=+24px goal=1923
+DETECT {'contours': 310, 'area_rej': 138, 'accepted': 17, 'range_rej': 107, 'solidity_rej': 35, 'aspect_rej': 5, 'size_rej': 8} targets=2 boxes=0 phase=CENTRE
+TRACK err=+13px goal=1891
+TRACK err=-11px goal=1836
+TRACK err=+24px goal=1950
+TRACK err=+45px goal=1992
+TRACK err=+45px goal=1962
+[ml] nearest z=0.27 raw=('ryobi_lying', 0.86) -> cls=ryobi_lying conf=0.86 colour=ryobi lying=True ok=True
+TRACK err=+37px goal=1896
+TRACK err=-29px goal=1798
+TRACK err=-41px goal=1861
+TRACK err=+3px goal=1982
+TRACK err=+37px goal=2027
+TRACK err=+66px goal=2041
+COLOUR VOTE ryobi=62 pink=0 -> ryobi
+ORIENTATION lying=56 upright=0 [src=yolo:battery_lying top=78mm h/w=0.42] -> LYING top-down (lying needs +2; L forces top-down)
+ROLL aligned to 6 deg: 989 -> 1741
+STAGE1 (blind — click point) t=0.64 goals={2: 2382, 3: 1538, 4: 2720, 5: 1525} z=0.272
+DETECT {'contours': 328, 'area_rej': 141, 'accepted': 16, 'solidity_rej': 41, 'range_rej': 101, 'size_rej': 18, 'aspect_rej': 11} targets=0 boxes=0 phase=STAGE1
+[ml] nearest z=0.26 raw=('ryobi_lying', 0.87) -> cls=ryobi_lying conf=0.87 colour=ryobi lying=True ok=True
+DETECT {'contours': 297, 'accepted': 9, 'aspect_rej': 35, 'area_rej': 125, 'range_rej': 104, 'size_rej': 10, 'solidity_rej': 14} targets=1 boxes=0 phase=STAGE1
+VERIFY — re-checking target position
+[ml] nearest z=0.26 raw=('ryobi_lying', 0.99) -> cls=ryobi_lying conf=0.99 colour=ryobi lying=True ok=True
+DETECT {'contours': 389, 'area_rej': 154, 'accepted': 18, 'aspect_rej': 32, 'range_rej': 87, 'solidity_rej': 45, 'size_rej': 53} targets=1 boxes=0 phase=VERIFY
+FULL goals={2: 2845, 3: 1267, 4: 2770, 5: 1006} (verify timeout)
+[ml] nearest z=0.26 raw=('ryobi_lying', 0.98) -> cls=ryobi_lying conf=0.98 colour=ryobi lying=True ok=True
+RELEASE from phase FULL — returning to rest
+DETECT {'contours': 385, 'area_rej': 153, 'accepted': 25, 'size_rej': 46, 'aspect_rej': 38, 'range_rej': 82, 'solidity_rej': 40, 'depth_rej': 1} targets=1 boxes=0 phase=IDLE
+[ml] nearest z=0.27 raw=('ryobi_lying', 0.99) -> cls=ryobi_lying conf=0.99 colour=ryobi lying=True ok=True
+DETECT {'contours': 268, 'area_rej': 131, 'accepted': 10, 'range_rej': 62, 'aspect_rej': 10, 'depth_rej': 3, 'size_rej': 33, 'solidity_rej': 19} targets=1 boxes=0 phase=IDLE
+[ml] nearest z=0.27 raw=('ryobi_lying', 0.99) -> cls=ryobi_lying conf=0.99 colour=ryobi lying=True ok=True
+DETECT {'contours': 233, 'accepted': 8, 'range_rej': 100, 'area_rej': 94, 'size_rej': 5, 'solidity_rej': 22, 'aspect_rej': 4} targets=1 boxes=0 phase=IDLE
+TARGET LOCKED (click->raw point) (220, 386) z=0.272 colour=ryobi
+GO — centring on target, goal=1892
+[ml] nearest z=0.26 raw=('ryobi_lying', 0.99) -> cls=ryobi_lying conf=0.99 colour=ryobi lying=True ok=True
+TRACK err=-72px goal=1922
+TRACK err=-65px goal=1938
+TRACK err=-31px goal=1989
+TRACK err=-13px goal=1970
+TRACK err=-17px goal=1935
+TRACK err=-41px goal=1878
+TRACK err=-28px goal=1920
+DETECT {'contours': 256, 'size_rej': 10, 'accepted': 12, 'area_rej': 102, 'range_rej': 95, 'aspect_rej': 7, 'solidity_rej': 30} targets=1 boxes=0 phase=CENTRE
+TRACK err=-11px goal=1968
+TRACK err=+21px goal=2003
+TRACK err=+15px goal=1969
+TRACK err=-32px goal=1916
+TRACK err=-34px goal=1938
+[ml] nearest z=0.27 raw=('ryobi_lying', 0.95) -> cls=ryobi_lying conf=0.95 colour=ryobi lying=True ok=True
+TRACK err=-18px goal=1966
+TRACK err=+9px goal=2020
+COLOUR VOTE ryobi=15 pink=0 -> ryobi
+ORIENTATION lying=15 upright=0 [src=yolo:battery_lying top=12mm h/w=0.52] -> LYING top-down (lying needs +2; L forces top-down)
+STAGE1 (blind — click point) t=0.16 goals={2: 2400, 3: 1501, 4: 2764, 5: 1035} z=0.260
+DETECT {'contours': 285, 'area_rej': 123, 'size_rej': 12, 'accepted': 13, 'range_rej': 100, 'solidity_rej': 24, 'aspect_rej': 13} targets=1 boxes=0 phase=STAGE1
+[ml] nearest z=0.26 raw=('ryobi_lying', 0.95) -> cls=ryobi_lying conf=0.95 colour=ryobi lying=True ok=True
+DETECT {'contours': 236, 'area_rej': 108, 'accepted': 10, 'range_rej': 94, 'aspect_rej': 9, 'size_rej': 5, 'solidity_rej': 10} targets=0 boxes=0 phase=STAGE1
+RELEASE from phase STAGE1 — returning to rest
+[ml] nearest z=0.26 raw=('ryobi_lying', 0.97) -> cls=ryobi_lying conf=0.97 colour=ryobi lying=True ok=True
+DETECT {'contours': 256, 'size_rej': 24, 'aspect_rej': 10, 'range_rej': 77, 'solidity_rej': 30, 'area_rej': 105, 'accepted': 10} targets=1 boxes=0 phase=IDLE
+[ml] nearest z=0.26 raw=('ryobi_lying', 0.99) -> cls=ryobi_lying conf=0.99 colour=ryobi lying=True ok=True
+TARGET LOCKED (click->detection) (239, 405) z=0.264 colour=ryobi src=depth
+GO — centring on target, goal=1913
+DETECT {'contours': 226, 'solidity_rej': 15, 'area_rej': 101, 'range_rej': 88, 'size_rej': 13, 'aspect_rej': 4, 'accepted': 5} targets=1 boxes=0 phase=CENTRE
+TRACK err=-27px goal=1971
+TRACK err=-7px goal=2009
+TRACK err=-64px goal=1918
+TRACK err=-85px goal=1888
+TRACK err=-37px goal=2009
+TRACK err=-7px goal=2059
+TRACK err=-5px goal=1983
+TRACK err=-15px goal=1905
+[ml] nearest z=0.26 raw=('ryobi_lying', 0.95) -> cls=ryobi_lying conf=0.95 colour=ryobi lying=True ok=True
+DETECT {'contours': 322, 'accepted': 15, 'area_rej': 146, 'aspect_rej': 11, 'solidity_rej': 29, 'range_rej': 109, 'size_rej': 12} targets=2 boxes=0 phase=CENTRE
+TRACK err=+5px goal=1962
+TRACK err=+10px goal=1947
+TRACK err=+11px goal=1936
+TRACK err=-20px goal=1858
+TRACK err=-6px goal=1935
+TRACK err=-18px goal=1903
+TRACK err=+22px goal=2001
+TRACK err=+19px goal=1927
+TRACK err=-12px goal=1844
+TRACK err=-47px goal=1792
+[ml] nearest z=0.28 raw=('ryobi_lying', 0.48) -> cls=ryobi_lying conf=0.48 colour=ryobi lying=True ok=True
+DETECT {'contours': 290, 'accepted': 16, 'range_rej': 94, 'solidity_rej': 37, 'area_rej': 126, 'size_rej': 12, 'aspect_rej': 5} targets=1 boxes=0 phase=CENTRE
+COLOUR VOTE ryobi=21 pink=0 -> ryobi
+ORIENTATION lying=21 upright=0 [src=yolo:battery_lying top=13mm h/w=0.66] -> LYING top-down (lying needs +2; L forces top-down)
+ROLL aligned to 2 deg: 1023 -> 1647
+STAGE1 (blind — click point) t=0.32 goals={2: 2394, 3: 1513, 4: 2749, 5: 1460} z=0.264
+[ml] nearest z=0.27 raw=('ryobi_lying', 0.89) -> cls=ryobi_lying conf=0.89 colour=ryobi lying=True ok=True
+DETECT {'contours': 284, 'area_rej': 95, 'accepted': 19, 'range_rej': 80, 'solidity_rej': 62, 'aspect_rej': 12, 'size_rej': 16} targets=2 boxes=0 phase=STAGE1
+VERIFY — re-checking target position
+[ml] nearest z=0.27 raw=('ryobi_lying', 0.95) -> cls=ryobi_lying conf=0.95 colour=ryobi lying=True ok=True
+DETECT {'contours': 362, 'area_rej': 148, 'accepted': 16, 'solidity_rej': 73, 'range_rej': 63, 'aspect_rej': 8, 'size_rej': 54} targets=1 boxes=0 phase=VERIFY
+ROLL aligned to 10 deg: 1023 -> 1821
+FULL goals={2: 2853, 3: 1249, 4: 2790, 5: 1821} (verify timeout)
+[ml] nearest z=0.22 raw=('background', 0.74) -> cls=pink_lying conf=0.15 colour=unknown lying=None ok=False
+ARM ARRIVED at reach pose
+DETECT {'contours': 398, 'size_rej': 67, 'area_rej': 156, 'accepted': 20, 'range_rej': 74, 'solidity_rej': 73, 'aspect_rej': 8} targets=2 boxes=0 phase=FULL
+GRIP closed at raw 1803
+DETECT {'contours': 134, 'area_rej': 60, 'solidity_rej': 15, 'size_rej': 30, 'accepted': 12, 'range_rej': 14, 'aspect_rej': 3} targets=0 boxes=0 phase=GRIPPED
+P_CARRY — ryobi battery to the GREEN bucket
+DETECT {} targets=0 boxes=0 phase=P_CARRY
+P_SWING — base to drop point at 2482
+P_HOVER — positioning above the drop point
+DETECT {} targets=0 boxes=0 phase=P_HOVER
+P_INSERT — final approach
+DETECT {} targets=0 boxes=0 phase=P_INSERT
+AT DROP POINT — settling
+P_RELEASE — opening in the sleeve
+DETECT {} targets=0 boxes=0 phase=P_RELEASE
+P_RETREAT — rising clear of the slot
+DETECT {} targets=0 boxes=0 phase=P_RETREAT
+DETECT {} targets=0 boxes=0 phase=P_RETREAT
+DETECT {} targets=0 boxes=0 phase=P_RETREAT
+P_HOME — folding arm before the base swings

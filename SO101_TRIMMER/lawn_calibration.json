@@ -1,0 +1,74 @@
+{
+  "version": 2,
+  "coordinate_system": {
+    "units": "metres",
+    "x_axis": "positive right from the lawn's left edge",
+    "y_axis": "positive away from the lawn's near edge",
+    "origin": "near-left lawn corner"
+  },
+  "lawn_width_m": 3.5,
+  "lawn_length_m": 2.1,
+  "image_points_order": [
+    "far-left",
+    "far-right",
+    "near-right",
+    "near-left"
+  ],
+  "image_points_far_left_far_right_near_right_near_left": [
+    [
+      35.0,
+      275.0
+    ],
+    [
+      531.0,
+      277.0
+    ],
+    [
+      619.0,
+      442.0
+    ],
+    [
+      6.0,
+      448.0
+    ]
+  ],
+  "image_points_tl_tr_br_bl": [
+    [
+      35.0,
+      275.0
+    ],
+    [
+      531.0,
+      277.0
+    ],
+    [
+      619.0,
+      442.0
+    ],
+    [
+      6.0,
+      448.0
+    ]
+  ],
+  "homography_image_to_lawn": [
+    [
+      0.010967016922042622,
+      0.0018384016805736189,
+      -0.8894060544292369
+    ],
+    [
+      -0.00019273495117737345,
+      -0.019691087511954794,
+      8.822763615062813
+    ],
+    [
+      -0.0001387426648915588,
+      0.002270418194322074,
+      1.0
+    ]
+  ],
+  "camera_width_px": 640,
+  "camera_height_px": 480,
+  "selected_polygon_area_px": 93769.5,
+  "corner_verification_max_error_m": 8.827107690860395e-16
+}

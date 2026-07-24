@@ -1,0 +1,10 @@
+{"time": "10:17:08", "station_raw": 1568, "base_deg": -37.5, "u": 427, "v": 315, "z_m": 0.686, "bearing_deg": -26.0, "x_m": -0.301, "y_m": 0.617, "area_px": 33800, "score": 0.655, "cnn": "", "snapshot": "snap_000.jpg"}
+{"time": "10:17:09", "station_raw": 1779, "base_deg": -19.0, "u": 502, "v": 206, "z_m": 0.601, "bearing_deg": 0.6, "x_m": 0.007, "y_m": 0.601, "area_px": 3597, "score": 0.762, "cnn": "", "snapshot": "snap_001.jpg"}
+{"time": "10:17:09", "station_raw": 1779, "base_deg": -19.0, "u": 132, "v": 317, "z_m": 0.647, "bearing_deg": -39.3, "x_m": -0.409, "y_m": 0.501, "area_px": 879, "score": 0.702, "cnn": "", "snapshot": "snap_002.jpg"}
+{"time": "10:17:10", "station_raw": 1990, "base_deg": -0.4, "u": 517, "v": 283, "z_m": 0.47, "bearing_deg": 20.8, "x_m": 0.167, "y_m": 0.439, "area_px": 1062, "score": 0.528, "cnn": "", "snapshot": "snap_003.jpg"}
+{"time": "10:17:10", "station_raw": 1990, "base_deg": -0.4, "u": 329, "v": 193, "z_m": 0.647, "bearing_deg": 0.5, "x_m": 0.006, "y_m": 0.647, "area_px": 2878, "score": 0.688, "cnn": "", "snapshot": "snap_004.jpg"}
+{"time": "10:17:10", "station_raw": 2200, "base_deg": 18.0, "u": 65, "v": 327, "z_m": 0.612, "bearing_deg": -9.5, "x_m": -0.101, "y_m": 0.604, "area_px": 1686, "score": 0.549, "cnn": "", "snapshot": "snap_005.jpg"}
+{"time": "10:17:10", "station_raw": 2200, "base_deg": 18.0, "u": 95, "v": 213, "z_m": 0.623, "bearing_deg": -6.2, "x_m": -0.068, "y_m": 0.619, "area_px": 3499, "score": 0.698, "cnn": "", "snapshot": "snap_006.jpg"}
+{"time": "10:17:11", "station_raw": 2413, "base_deg": 36.7, "u": 518, "v": 298, "z_m": 0.394, "bearing_deg": 58.1, "x_m": 0.334, "y_m": 0.208, "area_px": 358, "score": 0.532, "cnn": "", "snapshot": "snap_007.jpg"}
+{"time": "10:17:12", "station_raw": 2622, "base_deg": 55.1, "u": 532, "v": 71, "z_m": 0.816, "bearing_deg": 78.0, "x_m": 0.798, "y_m": 0.17, "area_px": 819, "score": 0.551, "cnn": "", "snapshot": "snap_008.jpg"}
+{"time": "10:17:12", "station_raw": 2622, "base_deg": 55.1, "u": 171, "v": 245, "z_m": 0.665, "bearing_deg": 39.0, "x_m": 0.419, "y_m": 0.517, "area_px": 3877, "score": 0.698, "cnn": "", "snapshot": "snap_009.jpg"}

@@ -1,0 +1,210 @@
+{
+  "session_id": "session_20260724_150730",
+  "status": "live",
+  "started": "2026-07-24T15:10:07",
+  "lawn_width_m": 3.4,
+  "lawn_length_m": 2.1,
+  "target_count": 20,
+  "targets": [
+    {
+      "target_id": 1,
+      "timestamp": "2026-07-24T15:07:31.599",
+      "x_m": 1.054,
+      "y_m": 0.683,
+      "confidence": 0.7195,
+      "observations": 3,
+      "snapshot": "snapshots/target_001.jpg",
+      "status": "detected"
+    },
+    {
+      "target_id": 2,
+      "timestamp": "2026-07-24T15:07:56.404",
+      "x_m": 2.608,
+      "y_m": 0.512,
+      "confidence": 0.7695,
+      "observations": 3,
+      "snapshot": "snapshots/target_002.jpg",
+      "status": "detected"
+    },
+    {
+      "target_id": 3,
+      "timestamp": "2026-07-24T15:08:06.539",
+      "x_m": 2.449,
+      "y_m": 0.022,
+      "confidence": 0.7195,
+      "observations": 3,
+      "snapshot": "snapshots/target_003.jpg",
+      "status": "detected"
+    },
+    {
+      "target_id": 4,
+      "timestamp": "2026-07-24T15:08:09.009",
+      "x_m": 2.615,
+      "y_m": 0.841,
+      "confidence": 0.7334,
+      "observations": 3,
+      "snapshot": "snapshots/target_004.jpg",
+      "status": "detected"
+    },
+    {
+      "target_id": 5,
+      "timestamp": "2026-07-24T15:08:41.854",
+      "x_m": 1.458,
+      "y_m": 1.339,
+      "confidence": 0.7843,
+      "observations": 3,
+      "snapshot": "snapshots/target_005.jpg",
+      "status": "detected"
+    },
+    {
+      "target_id": 6,
+      "timestamp": "2026-07-24T15:08:46.860",
+      "x_m": 3.116,
+      "y_m": 0.451,
+      "confidence": 0.9697,
+      "observations": 3,
+      "snapshot": "snapshots/target_006.jpg",
+      "status": "detected"
+    },
+    {
+      "target_id": 7,
+      "timestamp": "2026-07-24T15:08:48.724",
+      "x_m": 0.983,
+      "y_m": 1.041,
+      "confidence": 0.7341,
+      "observations": 3,
+      "snapshot": "snapshots/target_007.jpg",
+      "status": "detected"
+    },
+    {
+      "target_id": 8,
+      "timestamp": "2026-07-24T15:08:49.463",
+      "x_m": 1.43,
+      "y_m": 1.714,
+      "confidence": 0.7895,
+      "observations": 3,
+      "snapshot": "snapshots/target_008.jpg",
+      "status": "detected"
+    },
+    {
+      "target_id": 9,
+      "timestamp": "2026-07-24T15:08:52.861",
+      "x_m": 2.629,
+      "y_m": 1.185,
+      "confidence": 0.7514,
+      "observations": 3,
+      "snapshot": "snapshots/target_009.jpg",
+      "status": "detected"
+    },
+    {
+      "target_id": 10,
+      "timestamp": "2026-07-24T15:08:53.596",
+      "x_m": 1.381,
+      "y_m": 1.99,
+      "confidence": 0.7524,
+      "observations": 3,
+      "snapshot": "snapshots/target_010.jpg",
+      "status": "detected"
+    },
+    {
+      "target_id": 11,
+      "timestamp": "2026-07-24T15:08:56.652",
+      "x_m": 3.043,
+      "y_m": 0.018,
+      "confidence": 0.9433,
+      "observations": 3,
+      "snapshot": "snapshots/target_011.jpg",
+      "status": "detected"
+    },
+    {
+      "target_id": 12,
+      "timestamp": "2026-07-24T15:09:34.391",
+      "x_m": 2.541,
+      "y_m": 1.603,
+      "confidence": 0.7552,
+      "observations": 3,
+      "snapshot": "snapshots/target_012.jpg",
+      "status": "detected"
+    },
+    {
+      "target_id": 13,
+      "timestamp": "2026-07-24T15:09:37.133",
+      "x_m": 2.161,
+      "y_m": 0.033,
+      "confidence": 0.7563,
+      "observations": 3,
+      "snapshot": "snapshots/target_013.jpg",
+      "status": "detected"
+    },
+    {
+      "target_id": 14,
+      "timestamp": "2026-07-24T15:09:37.915",
+      "x_m": 1.842,
+      "y_m": 0.016,
+      "confidence": 0.8213,
+      "observations": 3,
+      "snapshot": "snapshots/target_014.jpg",
+      "status": "detected"
+    },
+    {
+      "target_id": 15,
+      "timestamp": "2026-07-24T15:09:40.319",
+      "x_m": 1.837,
+      "y_m": 0.545,
+      "confidence": 0.7637,
+      "observations": 3,
+      "snapshot": "snapshots/target_015.jpg",
+      "status": "detected"
+    },
+    {
+      "target_id": 16,
+      "timestamp": "2026-07-24T15:09:45.522",
+      "x_m": 1.468,
+      "y_m": 0.534,
+      "confidence": 0.8026,
+      "observations": 3,
+      "snapshot": "snapshots/target_016.jpg",
+      "status": "detected"
+    },
+    {
+      "target_id": 17,
+      "timestamp": "2026-07-24T15:09:46.917",
+      "x_m": 1.475,
+      "y_m": 0.085,
+      "confidence": 0.7431,
+      "observations": 3,
+      "snapshot": "snapshots/target_017.jpg",
+      "status": "detected"
+    },
+    {
+      "target_id": 18,
+      "timestamp": "2026-07-24T15:09:52.578",
+      "x_m": 0.227,
+      "y_m": 1.431,
+      "confidence": 0.7314,
+      "observations": 3,
+      "snapshot": "snapshots/target_018.jpg",
+      "status": "detected"
+    },
+    {
+      "target_id": 19,
+      "timestamp": "2026-07-24T15:10:02.060",
+      "x_m": 2.173,
+      "y_m": 1.596,
+      "confidence": 0.739,
+      "observations": 3,
+      "snapshot": "snapshots/target_019.jpg",
+      "status": "detected"
+    },
+    {
+      "target_id": 20,
+      "timestamp": "2026-07-24T15:10:07.257",
+      "x_m": 0.511,
+      "y_m": 0.99,
+      "confidence": 0.7421,
+      "observations": 3,
+      "snapshot": "snapshots/target_020.jpg",
+      "status": "detected"
+    }
+  ]
+}

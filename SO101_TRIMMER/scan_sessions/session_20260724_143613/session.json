@@ -1,0 +1,31 @@
+{
+  "session_id": "session_20260724_143613",
+  "status": "complete",
+  "started": "2026-07-24T14:37:49",
+  "lawn_width_m": 3.4,
+  "lawn_length_m": 2.1,
+  "target_count": 2,
+  "targets": [
+    {
+      "target_id": 1,
+      "timestamp": "2026-07-24T14:36:15.038",
+      "x_m": 2.607,
+      "y_m": 0.564,
+      "confidence": 0.778,
+      "observations": 3,
+      "snapshot": "snapshots/target_001.jpg",
+      "status": "detected"
+    },
+    {
+      "target_id": 2,
+      "timestamp": "2026-07-24T14:36:38.035",
+      "x_m": 2.951,
+      "y_m": 0.54,
+      "confidence": 0.8784,
+      "observations": 3,
+      "snapshot": "snapshots/target_002.jpg",
+      "status": "detected"
+    }
+  ],
+  "finished": "2026-07-24T14:37:49"
+}

@@ -1,0 +1,161 @@
+
+<div id="root"></div>
+<div id="tip" class="tip"></div>
+<style>
+  #root{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+        color:#eaf5ea;position:relative}
+  .wrap{background:radial-gradient(120% 120% at 50% -10%,#1f3a26 0%,#122318 60%,#0d1b12 100%);
+        border-radius:22px;padding:22px 22px 26px;box-shadow:0 18px 50px rgba(0,0,0,.45);
+        overflow:hidden}
+  .hdr{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:16px}
+  .title{display:flex;align-items:center;gap:12px}
+  .title .logo{font-size:30px;filter:drop-shadow(0 2px 6px rgba(0,0,0,.5));animation:bob 3s ease-in-out infinite}
+  .title h1{margin:0;font-size:23px;font-weight:800;letter-spacing:.2px}
+  .title .sub{margin:2px 0 0;font-size:12.5px;color:#9fc4a6;font-weight:500}
+  .pill{display:inline-flex;align-items:center;gap:8px;background:rgba(74,222,128,.14);
+        border:1px solid rgba(74,222,128,.35);color:#8ef0a8;padding:7px 13px;border-radius:999px;
+        font-size:12.5px;font-weight:700;text-transform:uppercase;letter-spacing:.6px}
+  .dot{width:9px;height:9px;border-radius:50%;background:#4ade80;box-shadow:0 0 0 0 rgba(74,222,128,.7);
+       animation:ping 1.6s infinite}
+  .chips{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+  .chip{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);border-radius:16px;
+        padding:12px 16px;min-width:118px;backdrop-filter:blur(4px);
+        animation:rise .6s cubic-bezier(.2,.8,.2,1) both}
+  .chip .v{font-size:25px;font-weight:800;line-height:1}
+  .chip .k{font-size:11.5px;color:#9fc4a6;text-transform:uppercase;letter-spacing:.7px;margin-top:5px;font-weight:600}
+  .stage{position:relative;border-radius:16px;overflow:hidden}
+  svg{display:block;width:100%;height:auto}
+  .stripe{transition:opacity .3s}
+  .poop{cursor:pointer}
+  .halo{transform-box:fill-box;transform-origin:center;animation:halo 2.4s ease-out infinite}
+  .glyph{font-size:26px;transform-box:fill-box;transform-origin:50% 90%}
+  .poop .pin{opacity:0;transform-box:fill-box;transform-origin:50% 100%;
+             animation:drop .7s cubic-bezier(.18,1.3,.35,1) forwards;animation-delay:var(--d)}
+  .badge{font:700 12px -apple-system,sans-serif;fill:#fff}
+  .sweep{transform-box:view-box;animation:sweep 4.2s ease-in-out infinite}
+  .legend{display:flex;gap:18px;flex-wrap:wrap;margin-top:14px;font-size:12.5px;color:#bcd8c2}
+  .legend span{display:inline-flex;align-items:center;gap:7px}
+  .sw{width:13px;height:13px;border-radius:4px;display:inline-block}
+  .empty{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;
+         justify-content:center;gap:10px;color:#bff0c8;text-align:center}
+  .empty .big{font-size:52px;animation:pop .6s cubic-bezier(.2,1.6,.4,1) both}
+  .tip{position:fixed;pointer-events:none;opacity:0;transition:opacity .12s;z-index:50;
+       background:rgba(12,22,15,.96);border:1px solid rgba(255,255,255,.14);border-radius:12px;
+       padding:9px 12px;font-size:12.5px;color:#eaf5ea;box-shadow:0 10px 30px rgba(0,0,0,.5);white-space:nowrap}
+  .tip b{color:#ffd27a}
+  @keyframes drop{0%{opacity:0;transform:translateY(-46px) scale(.4)}
+                  70%{opacity:1;transform:translateY(4px) scale(1.08)}
+                  100%{opacity:1;transform:translateY(0) scale(1)}}
+  @keyframes halo{0%{transform:scale(.6);opacity:.55}80%{opacity:0}100%{transform:scale(2.4);opacity:0}}
+  @keyframes ping{0%{box-shadow:0 0 0 0 rgba(74,222,128,.6)}70%{box-shadow:0 0 0 9px rgba(74,222,128,0)}100%{box-shadow:0 0 0 0 rgba(74,222,128,0)}}
+  @keyframes sweep{0%{transform:rotate(-38deg)}50%{transform:rotate(38deg)}100%{transform:rotate(-38deg)}}
+  @keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+  @keyframes pop{from{transform:scale(0)}to{transform:scale(1)}}
+</style>
+<script>
+const D = {"targets": [{"target_id": 1, "x_m": 1.15, "y_m": 2.4, "confidence": 0.92, "observations": 7, "status": "detected"}, {"target_id": 2, "x_m": 2.8, "y_m": 1.2, "confidence": 0.71, "observations": 4, "status": "detected"}, {"target_id": 3, "x_m": 0.6, "y_m": 3.3, "confidence": 0.55, "observations": 3, "status": "detected"}], "W": 3.6, "L": 4.2, "status": "live", "session": "demo_preview"};
+const W=D.W, L=D.L;
+const SCALE = Math.min(760/Math.max(W,0.5), 520/Math.max(L,0.5)); // px per metre, fit
+const PAD=46, PW=W*SCALE, PH=L*SCALE, VBW=PW+PAD*2, VBH=PH+PAD*2;
+const X = x => PAD + x*SCALE;                 // metres -> svg x
+const Y = y => PAD + (L - y)*SCALE;           // near edge (y=0) at bottom
+const conf = c => c>=0.8 ? '#e5484d' : c>=0.6 ? '#f5a524' : '#f7ce46';
+
+function stripes(){
+  let s='', n=Math.max(4, Math.round(L*2));
+  for(let i=0;i<n;i++){
+    const y0=PAD+i*(PH/n), h=PH/n, shade=i%2?'#5aa85f':'#68b96b';
+    s+=`<rect class="stripe" x="${PAD}" y="${y0}" width="${PW}" height="${h}" fill="${shade}"/>`;
+  }
+  return s;
+}
+function markers(){
+  return (D.targets||[]).map((t,i)=>{
+    const mx=X(t.x_m), my=Y(t.y_m), col=conf(t.confidence), d=(0.15+i*0.12).toFixed(2);
+    return `<g class="poop" data-i="${i}" transform="translate(${mx},${my})">
+      <circle class="halo" r="16" fill="${col}" opacity="0.5"/>
+      <g class="pin" style="--d:${d}s">
+        <circle r="17" fill="${col}" opacity=".22"/>
+        <circle r="11" fill="${col}" stroke="#fff" stroke-width="2"/>
+        <text class="glyph" text-anchor="middle" y="9">💩</text>
+        <circle cx="12" cy="-12" r="8.5" fill="#12231a" stroke="${col}" stroke-width="1.6"/>
+        <text class="badge" text-anchor="middle" x="12" y="-8.5">${t.target_id}</text>
+      </g></g>`;
+  }).join('');
+}
+const camX=X(W/2), camY=Y(0);
+const svg = `
+<svg viewBox="0 0 ${VBW} ${VBH}">
+  <defs>
+    <clipPath id="lawn"><rect x="${PAD}" y="${PAD}" width="${PW}" height="${PH}" rx="14"/></clipPath>
+    <radialGradient id="cone" cx="50%" cy="100%" r="90%">
+      <stop offset="0%" stop-color="#eafff0" stop-opacity=".28"/>
+      <stop offset="70%" stop-color="#eafff0" stop-opacity=".05"/>
+      <stop offset="100%" stop-color="#eafff0" stop-opacity="0"/></radialGradient>
+    <linearGradient id="beam" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0%" stop-color="#dfffe9" stop-opacity=".55"/>
+      <stop offset="100%" stop-color="#dfffe9" stop-opacity="0"/></linearGradient>
+  </defs>
+  <rect x="${PAD-6}" y="${PAD-6}" width="${PW+12}" height="${PH+12}" rx="18"
+        fill="none" stroke="rgba(255,255,255,.10)" stroke-width="2"/>
+  <g clip-path="url(#lawn)">
+    ${stripes()}
+    <polygon points="${camX},${camY} ${X(0)},${Y(L)} ${X(W)},${Y(L)}" fill="url(#cone)"/>
+    <g class="sweep" style="transform-origin:${camX}px ${camY}px">
+      <polygon points="${camX},${camY} ${camX-9},${PAD} ${camX+9},${PAD}" fill="url(#beam)"/>
+    </g>
+  </g>
+  <rect x="${PAD}" y="${PAD}" width="${PW}" height="${PH}" rx="14" fill="none"
+        stroke="#2c6e3f" stroke-width="3"/>
+  <g>
+    <circle cx="${camX}" cy="${camY}" r="15" fill="#12231a" stroke="#8ef0a8" stroke-width="2"/>
+    <text text-anchor="middle" x="${camX}" y="${camY+5}" font-size="15">📷</text>
+    <text text-anchor="middle" x="${camX}" y="${camY+30}" fill="#bcd8c2" font-size="11.5" font-weight="600">CAMERA</text>
+  </g>
+  ${markers()}
+</svg>`;
+
+const n=(D.targets||[]).length, area=(W*L);
+const root=document.getElementById('root');
+root.innerHTML = `
+<div class="wrap">
+  <div class="hdr">
+    <div class="title"><span class="logo">🌱</span>
+      <div><h1>Lawn Poop Map</h1><p class="sub">Session ${D.session} · top-down view</p></div>
+    </div>
+    <span class="pill"><span class="dot"></span>${D.status==='complete'?'Scan complete':'Live'}</span>
+  </div>
+  <div class="chips">
+    <div class="chip" style="animation-delay:.05s"><div class="v" data-count="${n}">0</div><div class="k">Poops found</div></div>
+    <div class="chip" style="animation-delay:.12s"><div class="v" data-count="${area.toFixed(1)}" data-suffix=" m²">0</div><div class="k">Lawn area</div></div>
+    <div class="chip" style="animation-delay:.19s"><div class="v">${W.toFixed(1)}×${L.toFixed(1)}</div><div class="k">Size (m)</div></div>
+  </div>
+  <div class="stage">${svg}${ n? '' :
+     `<div class="empty"><div class="big">✅</div><div><b>All clear!</b><br>No poop detected on this lawn.</div></div>`}</div>
+  <div class="legend">
+    <span><i class="sw" style="background:#e5484d"></i>High confidence</span>
+    <span><i class="sw" style="background:#f5a524"></i>Medium</span>
+    <span><i class="sw" style="background:#f7ce46"></i>Low</span>
+    <span><i class="sw" style="background:#68b96b"></i>Mowed turf</span>
+  </div>
+</div>`;
+
+// count-up numbers
+document.querySelectorAll('[data-count]').forEach(el=>{
+  const end=parseFloat(el.dataset.count), dec=(el.dataset.count.indexOf('.')>=0)?1:0,
+        suf=el.dataset.suffix||''; let t0=null;
+  function step(ts){ if(!t0)t0=ts; const p=Math.min(1,(ts-t0)/900);
+    el.textContent=(end*(0.5-Math.cos(Math.PI*p)/2)).toFixed(dec)+suf;
+    if(p<1)requestAnimationFrame(step);} requestAnimationFrame(step);
+});
+// tooltips
+const tip=document.getElementById('tip');
+document.querySelectorAll('.poop').forEach(g=>{
+  const t=D.targets[+g.dataset.i];
+  g.addEventListener('mouseenter',()=>{tip.style.opacity=1;
+    tip.innerHTML=`<b>Poop #${t.target_id}</b><br>${t.x_m.toFixed(2)} m right · ${t.y_m.toFixed(2)} m out<br>confidence ${(t.confidence*100).toFixed(0)}% · ${t.observations} obs`;});
+  g.addEventListener('mousemove',e=>{tip.style.left=(e.clientX+14)+'px';tip.style.top=(e.clientY+14)+'px';});
+  g.addEventListener('mouseleave',()=>{tip.style.opacity=0;});
+});
+</script>

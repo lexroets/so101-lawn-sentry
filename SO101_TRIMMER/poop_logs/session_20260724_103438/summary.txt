@@ -1,0 +1,23 @@
+Poop scan summary — 2026-07-24 10:34:51
+Distinct detections: 0
+
+
+Top-down map (A = base, # = poop, forward = up):
+
+                                         
+                                         
+                                         
+                                         
+                                         
+                                         
+                                         
+                                         
+                                         
+                                         
+                                         
+                                         
+                                         
+                                         
+                                         
+                                         
+--------------------A--------------------

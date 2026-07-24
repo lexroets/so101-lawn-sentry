@@ -1,0 +1,2 @@
+time,station_raw,base_deg,u,v,z_m,bearing_deg,x_m,y_m,area_px,score,cnn,snapshot
+10:28:50,1101,-78.6,413,383,1.632,-68.5,-1.519,0.597,405,0.773,,snap_000.jpg

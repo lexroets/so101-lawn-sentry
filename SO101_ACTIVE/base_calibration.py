@@ -1,0 +1,4 @@
+# Measured by calibrate_full.py 2026-07-17 11:52:39
+RAW_PER_PIXEL = 1.200
+BASE_DIRECTION_SIGN = 1
+CAMERA_LATENCY_S = 0.170

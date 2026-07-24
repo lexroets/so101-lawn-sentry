@@ -1,0 +1,24 @@
+Poop scan summary — 2026-07-24 10:28:50
+Distinct detections: 1
+
+  #1: ~0.60 m ahead, 1.52 m left  (bearing -69 deg, score 0.77)
+
+Top-down map (A = base, # = poop, forward = up):
+
+                                         
+                                         
+                                         
+                                         
+                                         
+                                         
+                                         
+                                         
+                                         
+                                         
+                                         
+                                         
+                                         
+                                         
+                                         
+                                         
+--------------------A--------------------

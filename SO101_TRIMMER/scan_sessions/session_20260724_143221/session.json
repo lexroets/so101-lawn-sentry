@@ -1,0 +1,21 @@
+{
+  "session_id": "session_20260724_143221",
+  "status": "complete",
+  "started": "2026-07-24T14:32:54",
+  "lawn_width_m": 3.4,
+  "lawn_length_m": 2.1,
+  "target_count": 1,
+  "targets": [
+    {
+      "target_id": 1,
+      "timestamp": "2026-07-24T14:32:24.532",
+      "x_m": 2.633,
+      "y_m": 0.77,
+      "confidence": 0.708,
+      "observations": 3,
+      "snapshot": "snapshots/target_001.jpg",
+      "status": "detected"
+    }
+  ],
+  "finished": "2026-07-24T14:32:54"
+}
