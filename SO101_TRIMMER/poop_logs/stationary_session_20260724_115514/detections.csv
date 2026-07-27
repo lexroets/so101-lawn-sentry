@@ -1,4 +1,0 @@
-id,timestamp,elapsed_s,score,hits,u_px,v_px,bbox_x,bbox_y,bbox_w,bbox_h,range_m,bearing_deg,right_m,forward_m,depth_samples,snapshot
-1,2026-07-24T11:55:15.772,0.831,0.7563,3,436,350,424,315,46,48,1.5223,12.506,0.3296,1.4862,robust_bbox_median,poop_001.jpg
-2,2026-07-24T11:55:15.836,0.894,0.7446,3,216,393,184,385,64,17,1.714,-11.213,-0.3333,1.6813,robust_bbox_median,poop_002.jpg
-3,2026-07-24T11:55:18.250,3.308,0.7496,3,536,340,520,332,36,20,1.4629,23.288,0.5784,1.3437,robust_bbox_median,poop_003.jpg

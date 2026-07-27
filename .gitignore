@@ -1,0 +1,32 @@
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# ---- generated output (recreated every run) ----
+# scan_lawn.py deletes and recreates scan sessions on every launch, so tracking
+# them fills `git status` with hundreds of phantom deletions.
+SO101_TRIMMER/output/
+live.jpg
+live.tmp.jpg
+
+# ---- large datasets (re-downloadable) ----
+SO101_TRIMMER/data/poop_dataset/
+SO101_TRIMMER/data/grass_dataset/
+SO101_TRIMMER/data/real_poop/
+SO101_TRIMMER/data/mydata/
+SO101_TRIMMER/data/sam_images/
+*.zip
+
+# The trained detector (data/poop_yolo.onnx, ~12 MB) IS committed on purpose:
+# it is the working demo model, well under GitHub's 100 MB file limit.
+*.bak
+
+# ---- misc ----
+.DS_Store
+Thumbs.db
+_backup/
+SO101_ACTIVE/debug_log.txt
+runs/

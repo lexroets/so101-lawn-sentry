@@ -1,4 +1,0 @@
-target_id,timestamp,x_m,y_m,confidence,observations,snapshot,status
-1,2026-07-24T15:57:17.779,0.596,0.783,0.83,3,snapshots/target_001.jpg,detected
-2,2026-07-24T15:57:35.517,2.168,0.565,0.9007,3,snapshots/target_002.jpg,detected
-3,2026-07-24T15:57:40.653,0.591,1.427,0.8329,3,snapshots/target_003.jpg,detected
