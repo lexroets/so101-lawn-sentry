@@ -1,0 +1,66 @@
+{
+  "version": 5,
+  "calibration_type": "aruco_marker_walk",
+  "created": "2026-07-28T15:01:37",
+  "lawn_width_m": 1.0,
+  "lawn_length_m": 0.6,
+  "reference_box_m": [
+    1.0,
+    0.6
+  ],
+  "marker_size_m": 0.15,
+  "image_points_tl_tr_br_bl": [
+    [
+      51.260398864746094,
+      353.15802001953125
+    ],
+    [
+      494.3719482421875,
+      428.5843811035156
+    ],
+    [
+      457.44305419921875,
+      235.5587615966797
+    ],
+    [
+      131.3513641357422,
+      205.78579711914062
+    ]
+  ],
+  "homography_image_to_lawn": [
+    [
+      0.00731867678287539,
+      0.00397741091578096,
+      -1.7798128548736236
+    ],
+    [
+      0.0013700267503652802,
+      -0.008048574362044928,
+      2.772190468000652
+    ],
+    [
+      0.0005777246776041808,
+      0.005267063070144189,
+      1.0
+    ]
+  ],
+  "accuracy": {
+    "worst_error_cm": 2.23,
+    "rms_error_cm": 1.58,
+    "worst_error_pct_of_marker": 14.9,
+    "per_capture_error_cm": [
+      2.23,
+      -0.46,
+      -0.24,
+      2.17
+    ],
+    "worst_out_of_square_pct": 12.9,
+    "corner_assignment": 1,
+    "verdict": "GOOD - fine for detection and mapping"
+  },
+  "panned": false,
+  "pan_source": null,
+  "camera": "OAK-D Lite",
+  "camera_width_px": 640,
+  "camera_height_px": 480
+}

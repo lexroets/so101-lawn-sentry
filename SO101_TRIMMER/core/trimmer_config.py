@@ -13,14 +13,15 @@ Everything here is independent of the battery-sorter config; this folder does
 not import from SO101_ACTIVE, so the old system is untouched.
 """
 
-# --- make the project's flat imports work from any subfolder (see paths.py) ---
+# --- put the project's folders on sys.path (see paths.py) --------------------
 import sys as _sys, pathlib as _pl
-_R = _pl.Path(__file__).resolve().parent
-_R = _R if (_R / 'paths.py').is_file() else _R.parent
-for _p in ('', 'core', 'calibrate', 'run', 'dashboard', 'training', 'tools'):
-    _d = str(_R / _p) if _p else str(_R)
-    if _d not in _sys.path:
-        _sys.path.insert(0, _d)
+_d = _pl.Path(__file__).resolve().parent
+while not (_d / 'paths.py').is_file() and _d != _d.parent:
+    _d = _d.parent
+if str(_d) not in _sys.path:
+    _sys.path.insert(0, str(_d))
+import paths as _paths
+_paths.bootstrap()
 # -----------------------------------------------------------------------------
 
 # --- bus -------------------------------------------------------------------
@@ -55,8 +56,11 @@ SETTLE_S = 0.20
 # --- safety ----------------------------------------------------------------
 # Base yaw range verified on the original arm. Keep the trimmer sweeping
 # within a safe arc; widen only after checking clearance.
-BASE_RAW_MIN = 981
-BASE_RAW_MAX = 2946
+# Full servo travel. The old 981..2946 window was set for the trimmer, whose
+# head could hit things; a camera on top has no such constraint and needs to
+# look wherever the lawn is.
+BASE_RAW_MIN = 0
+BASE_RAW_MAX = 4095
 # Per-joint full travel; taught poses are trusted because you demonstrated
 # them physically. A hard clamp still protects against a bad command.
 JOINT_RAW_MIN = 0
@@ -179,3 +183,10 @@ try:
     from reach_trim_edge import *    # noqa: F401,F403  persisted REACH_TRIM_EDGE
 except ImportError:
     pass
+
+
+# --- camera ----------------------------------------------------------------
+# A property of the OAK-D Lite itself, so it lives with the hardware config
+# rather than in either project. Used only as a fallback: camera_intrinsics
+# asks the device for its factory calibration first.
+CAMERA_HFOV_DEG = 69.0        # OAK-D Lite RGB horizontal field of view

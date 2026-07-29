@@ -1,0 +1,14 @@
+# Streamlit re-runs the script whenever a file under the app changes. The scan
+# writes live.jpg about fifteen times a second, so the watcher was firing every
+# couple of seconds - each rerun rebuilding the video iframe. This turns it off
+# at the config level too, in case the command-line flag is ignored.
+[server]
+fileWatcherType = "none"
+runOnSave = false
+headless = true
+
+[browser]
+gatherUsageStats = false
+
+[client]
+toolbarMode = "minimal"

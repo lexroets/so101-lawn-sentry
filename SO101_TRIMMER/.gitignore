@@ -1,0 +1,23 @@
+# Generated every run — a scan session is snapshots plus a live.jpg written
+# fifteen times a second. Committing these would grow the repo without limit
+# and they can always be reproduced by running the scan again.
+output/
+data/grass_dataset/
+data/poop_dataset/
+data/real_poop/
+
+# The trained model and the calibration ARE committed: without them a clone
+# cannot run the demo. They are in data/ and deliberately not ignored.
+
+__pycache__/
+*.pyc
+*.pyo
+.DS_Store
+.ipynb_checkpoints/
+.venv/
+venv/
+*.egg-info/
+
+# scratch
+*.bak
+*.tmp

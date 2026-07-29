@@ -1,11 +1,12 @@
-# --- make the project's flat imports work from any subfolder (see paths.py) ---
+# --- put the project's folders on sys.path (see paths.py) --------------------
 import sys as _sys, pathlib as _pl
-_R = _pl.Path(__file__).resolve().parent
-_R = _R if (_R / 'paths.py').is_file() else _R.parent
-for _p in ('', 'core', 'calibrate', 'run', 'dashboard', 'training', 'tools'):
-    _d = str(_R / _p) if _p else str(_R)
-    if _d not in _sys.path:
-        _sys.path.insert(0, _d)
+_d = _pl.Path(__file__).resolve().parent
+while not (_d / 'paths.py').is_file() and _d != _d.parent:
+    _d = _d.parent
+if str(_d) not in _sys.path:
+    _sys.path.insert(0, str(_d))
+import paths as _paths
+_paths.bootstrap()
 # -----------------------------------------------------------------------------
 # Written by calibrate_trimmer.py 2026-07-22 14:49:13
 # Trimmer arm taught poses (4 joints: base/shoulder/elbow/wrist).
