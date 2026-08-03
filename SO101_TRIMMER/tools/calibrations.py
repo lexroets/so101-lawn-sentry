@@ -46,7 +46,18 @@ def main():
     args = sys.argv[1:]
     if not args:
         show_list(rows)
-        return
+        # Thonny cannot pass arguments, so offer the one thing you would
+        # actually want next rather than printing a command line you have no
+        # way to type.
+        if rows:
+            try:
+                pick = input('restore which number? (ENTER to leave it alone): ').strip()
+            except EOFError:
+                pick = ''
+            if pick:
+                args = ['restore', pick]
+        if not args:
+            return
     cmd = args[0]
 
     if cmd == 'keep':

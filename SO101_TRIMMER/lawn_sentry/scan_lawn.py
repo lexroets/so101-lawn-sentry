@@ -113,7 +113,30 @@ LIVE_MAX_W = 512            # downscale before encoding; 0 = full size
 # frame dragged the WHOLE loop down to detector speed, and the video with it.
 # Detections do not need to be recomputed 15 times a second - the targets are
 # not going anywhere - so run it every Nth frame and publish video every frame.
-DETECT_EVERY_N = 3
+DETECT_EVERY_N = 2
+
+# Running it every Nth frame only SPREADS the stall; it does not remove it. On
+# the frames where it fires, everything behind it still waits - including the
+# frame being written for the dashboard - so the feed hitches on a rhythm.
+# With the detector on its own thread the loop hands over a frame and carries
+# on, and the video runs at camera rate whatever inference costs.
+#
+# Measured with cv2.dnn and 3x3 tiling: about 580 ms per detection. Inline at
+# DETECT_EVERY_N=3 that is a ~200 ms average stall on every frame. Off the
+# loop it is zero.
+#
+# Set to False to go back to inline detection if anything looks wrong.
+DETECT_ASYNC = True
+
+# Running the detector off the loop has one cost: its results describe a frame
+# that is a few hundred milliseconds old. Standing still that does not matter.
+# Sweeping, it does - the picture has slid on, so every box sits behind its
+# object and the tracking looks loose.
+#
+# The ground tracker already knows how the view moved between those two
+# frames, so the boxes can simply be carried forward. At the survey rate the
+# correction is a handful of pixels; at hand-panning speed it is tens.
+DETECT_CARRY_FORWARD = True
 
 # --- MOVING CAMERA (opt-in, OFF by default) --------------------------------
 # False -> the demo behaviour: the camera must stay still, because the
@@ -399,6 +422,14 @@ def main():
     cal=cal_store.load(CAL_FILE); purge_old_sessions()
     cal, _surveyed = apply_lawn_extent(cal)
     cam=CameraSession(build_pipeline); det=PoopDetector(); session=Session(cal); preview_n=0
+    # The detector runs on its own thread so its cost never reaches the video.
+    worker=None
+    carry_forward=None
+    if DETECT_ASYNC:
+        from detect_worker import DetectWorker, carry_forward
+        worker=DetectWorker(det.detect)
+        print('[scan] detector running off the main loop - the live feed no '
+              'longer waits for inference')
     print('session:',session.dir); print('web app: streamlit run lawn_map_app.py')
     shape=None; H=None; frame_n=0; tracker=None
     _live_ok=[False,False]        # [logged success, logged failure] — once each
@@ -565,25 +596,40 @@ def main():
                         session.set_lawn_polygon(lp, lawnmap.area())
                         if anchor is not None:
                             anchor.set_lawn_reference(lp)
-            # Publish a frame FIRST, every time round the loop, so the stream
-            # runs at camera rate instead of detector rate. The annotated
-            # version replaces it a moment later on detection frames.
-            if frame_n % LIVE_EVERY_N == 0:
-                try:
-                    _q=frame
-                    if LIVE_MAX_W and frame.shape[1]>LIVE_MAX_W:
-                        _sc=LIVE_MAX_W/frame.shape[1]
-                        _q=cv2.resize(frame,None,fx=_sc,fy=_sc,
-                                      interpolation=cv2.INTER_LINEAR)
-                    _t=session.dir/'live.tmp.jpg'
-                    cv2.imwrite(str(_t),_q,[int(cv2.IMWRITE_JPEG_QUALITY),LIVE_JPEG_Q])
-                    _t.replace(session.dir/'live.jpg')
-                except Exception:
-                    pass
+            # A raw frame used to be published here and then overwritten by the
+            # annotated one further down. That made sense while detection ran
+            # inline and the annotated frame was only ready on some passes.
+            #
+            # It is now actively harmful. Every frame was encoded and written
+            # to disk TWICE, and the stream picks up whichever version it
+            # happens to catch - so roughly half the frames reaching the
+            # browser had no boxes on them, and the overlay strobed. With the
+            # detector off the loop, results are available on every pass, so
+            # there is one publish and it is always the annotated one.
 
-            # Only run the detector every Nth frame. `dets` persists between
-            # runs so the boxes stay on screen and tracking is unaffected.
-            if frame_n % DETECT_EVERY_N == 0 or not hasattr(main,'_dets'):
+            # Hand the frame to the detector THREAD and carry straight on. The
+            # inference itself costs a few hundred milliseconds; running it
+            # here used to stop everything behind it, the published frame
+            # included, so the live feed hitched every time it fired. Now the
+            # loop never waits for it: we offer the newest frame and use
+            # whatever results are ready. Detections lag the video by a frame
+            # or two, which nobody can see, instead of the video lagging the
+            # detector, which everybody could.
+            if DETECT_ASYNC:
+                if frame_n % DETECT_EVERY_N == 0 and not worker.busy:
+                    # remember the camera pose this frame was taken at
+                    worker.submit(frame, depth, roi_poly=roi_quad,
+                                  tag=(None if session.live_H is None
+                                       else np.array(session.live_H, copy=True)))
+                dets, _H_det = worker.latest()
+                stats.update(worker.stats)
+                # Bring the boxes forward from the frame they were found in to
+                # the one on screen. Without this they trail their objects
+                # whenever the camera is panning, which reads as sloppy
+                # tracking even though the detections themselves are fine.
+                if DETECT_CARRY_FORWARD and _H_det is not None:
+                    dets = carry_forward(dets, _H_det, session.live_H)
+            elif frame_n % DETECT_EVERY_N == 0 or not hasattr(main,'_dets'):
                 dets=det.detect(frame,depth,stats,roi_poly=roi_quad)
                 main._dets=dets
             else:
@@ -669,23 +715,43 @@ def main():
                     pass
                 session.arm=armc.status()
 
-            # --- a HOME press from the dashboard resets the plane -----------
-            # Deliberately delayed: the file carries the time to act, set a few
-            # seconds ahead so the arm has finished moving. Re-anchoring early
-            # would capture the view mid-swing and be worse than not doing it.
-            if tracker is not None and frame_n % 4 == 0:
+            # --- back at the origin? throw the accumulated drift away --------
+            # Visual tracking chains frame-to-frame homographies, and chaining
+            # compounds: every estimate is nearly right, and "nearly" adds up
+            # until the outline has crept off the grass. There is no way to fix
+            # that from the middle of a sweep - but there IS a moment when the
+            # calibration is exactly true again, and that is when the camera is
+            # back at the pose the plane was measured at.
+            #
+            # The arm process writes a note whenever it reaches that pose: on a
+            # HOME press, and every time a sweep passes through the origin. The
+            # note carries an EXPIRY rather than a delay, because it is only
+            # worth acting on while the camera is still there. Acting on a late
+            # one would anchor the plane to wherever the sweep has got to since
+            # - introducing exactly the error this removes.
+            #
+            # Checked EVERY frame, not every fourth: at 2.5 deg/s a sweep is
+            # only within a degree of the origin for about a second, and the
+            # window should not be missed for the sake of three file stats.
+            if tracker is not None:
                 _rq=session.dir/'reanchor.json'
                 try:
                     if _rq.is_file():
                         _c=json.loads(_rq.read_text())
-                        if time.time() >= float(_c.get('at', 0)):
-                            _rq.unlink()
+                        _rq.unlink()
+                        _now=time.time()
+                        _exp=float(_c.get('expires', _c.get('at', 0) + 1.2))
+                        if _now <= _exp:
                             tracker.anchor()
                             session.live_H=tracker.W
                             _bad_outline=0
                             _last_recover=time.monotonic()
-                            print('[scan] HOME pressed - arm back at rest, lawn '
-                                  'plane re-aligned to the calibration.')
+                            print(f'[scan] {_c.get("why","at rest")} - lawn plane '
+                                  f're-aligned to the calibration.')
+                        else:
+                            print(f'[scan] re-anchor request arrived '
+                                  f'{_now-_exp:.1f}s late - ignored, the camera '
+                                  f'has moved on.')
                 except Exception:
                     pass
 
@@ -799,5 +865,8 @@ def main():
                 print('[scan] arm connection closed')
             except Exception:
                 pass
+        if worker is not None:
+            print(f'[scan] detector: {worker.health()}')
+            worker.stop()
         session.finish(); cam.stop(); cv2.destroyAllWindows(); print('complete:',session.dir)
 if __name__=='__main__': main()

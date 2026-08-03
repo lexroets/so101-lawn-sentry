@@ -138,9 +138,17 @@ def main():
         print(f'The stated size swaps to {Wk} x {Lk} m - an odd quarter turn '
               f'means what you\ncalled the width runs away from the camera, '
               f'not across it.')
+    # Thonny runs a file with no arguments and there is no obvious way to add
+    # one, so asking is the only way this is usable from the editor. From a
+    # terminal, --apply skips the question.
     if not args.apply:
-        print('\nNothing written. To do it:  python tools/fix_orientation.py --apply')
-        return
+        try:
+            answer = input('\nApply this turn? [y/N]: ').strip().lower()
+        except EOFError:
+            answer = ''
+        if not answer.startswith('y'):
+            print('Nothing written.')
+            return
 
     cal['homography_image_to_lawn'] = Hk.tolist()
     cal['lawn_width_m'] = Wk

@@ -53,10 +53,35 @@ def _arm():
             from arm_control import ArmControl
             a = ArmControl()
             _ARM['ctl'] = a if a.ok else None
+            if a.ok:
+                a.on_at_home = _request_reanchor
             print('[dash] arm connected' if a.ok else f'[dash] arm: {a.error}')
         except Exception as e:
             print(f'[dash] arm unavailable: {e}')
     return _ARM['ctl']
+
+
+def _request_reanchor(why='at rest'):
+    """Ask the scan to throw away accumulated tracking drift.
+
+    The arm lives in this process and the ground tracker lives in the scan, so
+    the two talk through a file in the session folder. It carries an EXPIRY,
+    not a delay: the note is only worth acting on while the camera is still at
+    the pose it was written for. A stale note would re-anchor the plane to
+    wherever the arm has swept to since, which is the opposite of the point.
+    """
+    sess = _newest_session()
+    if sess is None:
+        return
+    # Short on purpose. The scan checks every frame, so 0.6 s is many chances
+    # to see it, and at the survey rate the camera drifts under two degrees in
+    # that time - small next to the error being cancelled.
+    now = time.time()
+    try:
+        (sess / 'reanchor.json').write_text(json.dumps(
+            {'at': now, 'expires': now + 0.6, 'why': why}))
+    except OSError:
+        pass
 
 # Resolving "which session is newest" means globbing + stat-ing the whole tree.
 # The stream checks for a new frame every few milliseconds, so cache it briefly
@@ -137,23 +162,37 @@ class _ActHandler(BaseHTTPRequestHandler):
         self.end_headers()
         last_m = 0.0
         starved = 0.0
+        # Resolve which file we are watching ONCE and hold on to it. This used
+        # to re-resolve on every pass - two stat calls plus a possible glob,
+        # over a hundred times a second - purely to answer a question whose
+        # answer changes when a new scan starts, which is rarely. Re-check only
+        # when the file has gone quiet.
+        p = _newest_live()
+        recheck = 0.0
         try:
             while True:
-                p = _newest_live()
                 m = 0.0
                 if p is not None:
                     try:
                         m = p.stat().st_mtime
                     except OSError:
-                        m = 0.0
+                        m, p = 0.0, None
                 if m <= last_m:
-                    time.sleep(0.008)
-                    starved += 0.008
+                    # Halved from 8 ms. This sleep is pure added latency on
+                    # every frame - the publisher is already finished, we just
+                    # have not looked yet - and 4 ms of polling costs nothing
+                    # measurable next to a frame the browser has to decode.
+                    time.sleep(0.004)
+                    starved += 0.004
+                    if starved >= recheck + 1.0:      # did a new scan start?
+                        recheck = starved
+                        p = _newest_live(max_age=0.0)
                     # nothing publishing for 20 s -> drop the connection so the
                     # client falls back and we don't leak a thread
                     if starved > 20.0:
                         break
                     continue
+                recheck = 0.0
                 try:
                     buf = p.read_bytes()
                 except OSError:
@@ -196,7 +235,25 @@ class _ActHandler(BaseHTTPRequestHandler):
                     return json.loads((d / name).read_text())
                 except (OSError, ValueError):
                     return dflt
-            s = rd('session.json') or {}
+            # The browser asks three times a second and the scan rewrites
+            # session.json far less often than that, so most polls were
+            # re-reading and re-parsing a file that had not changed. Key a
+            # small cache on its modification time: unchanged file, no work.
+            # The arm status is deliberately OUTSIDE the cache - that is the
+            # part the page needs fresh when you are steering.
+            s = None
+            try:
+                _mt = (d / 'session.json').stat().st_mtime_ns
+                _c = getattr(_ActHandler, '_session_cache', None)
+                if _c and _c[0] == _mt and _c[1] == d.name:
+                    s = _c[2]
+                else:
+                    s = rd('session.json') or {}
+                    _ActHandler._session_cache = (_mt, d.name, s)
+            except OSError:
+                pass
+            if s is None:
+                s = rd('session.json') or {}
             out = {
                 'targets': s.get('targets', []),
                 'status': s.get('status', 'live'),
@@ -257,19 +314,12 @@ class _ActHandler(BaseHTTPRequestHandler):
             elif cmd == 'stop':
                 ok = a.stop_sweep()
             elif cmd == 'home':
-                ok = a.go_home()
                 # HOME is the hard reset: put the arm back AND re-align the
-                # plane. The scan owns the tracker, so leave it a note - and
-                # date it a few seconds out, because re-anchoring while the arm
-                # is still swinging would just lock in a mid-move view.
-                if ok:
-                    sess = _newest_session()
-                    if sess is not None:
-                        try:
-                            (sess / 'reanchor.json').write_text(json.dumps(
-                                {'at': time.time() + 3.5, 'why': 'home'}))
-                        except OSError:
-                            pass
+                # plane. go_home() now watches for the arm to actually ARRIVE
+                # and calls back then, rather than this guessing how long the
+                # swing takes - a guess that was too short re-anchored the
+                # plane to a mid-move view.
+                ok = a.go_home()
             elif cmd == 'ping':
                 a.ping(); ok = True
         body = json.dumps({'ok': ok, 'cmd': cmd,
