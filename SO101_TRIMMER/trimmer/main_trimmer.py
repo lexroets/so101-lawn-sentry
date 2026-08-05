@@ -132,12 +132,14 @@ def main():
         arm.wait_arrived(REST_POSE, tol=ARRIVE_TOL_RAW * 3)
         arm.move_to(BASE_ID, BASE_FORWARD_RAW)
 
+    from keys import Keys
+    kb = Keys()
     try:
         while pipeline.isRunning():
             now = time.monotonic()
             group = queue.tryGet()
             if group is None:
-                if cv2.waitKey(1) & 255 == ord('q'):
+                if kb.poll(1).hit(ord('q')):
                     break
                 continue
             image = group['rgb'].getCvFrame()
@@ -262,20 +264,21 @@ def main():
                         (0, 255, 255), 2)
             cv2.imshow(window, image)
 
-            key = cv2.waitKey(1) & 255
-            if key == ord('q'):
+            kb.poll(1)
+            key = kb.key
+            if kb.hit(ord('q')):
                 break
             if key in (13, 10) and now - last_enter > 0.4:
                 last_enter = now
                 auto = not auto
                 log(f"AUTO {'ON' if auto else 'OFF'}")
-            if key == ord(' ') and phase == 'IDLE' and target is not None:
+            if kb.hit(ord(' ')) and phase == 'IDLE' and target is not None:
                 base_centre = None
                 centre_ok = 0
                 track_reset()
                 phase, phase_start = 'CENTRE', now
                 log("SPACE — trimming highlighted patch")
-            if key == ord('e'):
+            if kb.hit(ord('e')):
                 arm.emergency_stop()
                 log("E-STOP")
                 break

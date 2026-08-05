@@ -69,6 +69,8 @@ def main():
     obj_z = None
     message, message_until = '', 0.0
     window = 'SO-101 REACH CALIBRATION (z lock · ENTER pose · r rest · f finish)'
+    from keys import Keys
+    kb = Keys()
     try:
         while pipeline.isRunning():
             now = time.monotonic()
@@ -102,14 +104,15 @@ def main():
                     cv2.putText(image, message, (8, 72), 0, 0.55, (0, 0, 255), 2)
                 cv2.imshow(window, image)
 
-            key = cv2.waitKey(1) & 255
-            if key == ord('q'):
+            kb.poll(1)
+            key = kb.key
+            if kb.hit(ord('q')):
                 print("Aborted — nothing written.")
                 return
-            if key == ord('r'):
+            if kb.hit(ord('r')):
                 rest = arm.read_pose()
                 message, message_until = 'REST captured', now + 1.5
-            elif key == ord('z'):
+            elif kb.hit(ord('z')):
                 if obj_z is None:
                     message = 'no target in view (raise arm / move closer to >0.2m)'
                     message_until = now + 2.5
@@ -123,12 +126,12 @@ def main():
                     pending_z = obj_z
                     message = f'z locked {pending_z:.3f} — now lower trimmer, ENTER'
                     message_until = now + 3.0
-            elif key == ord('u'):
+            elif kb.hit(ord('u')):
                 if pts:
                     pts.pop()
                     message = f'undo — {len(pts)} points'
                     message_until = now + 1.5
-            elif key == ord('f'):
+            elif kb.hit(ord('f')):
                 if rest is None or len(pts) < 2:
                     message = 'need REST + >= 2 points'
                     message_until = now + 2.0

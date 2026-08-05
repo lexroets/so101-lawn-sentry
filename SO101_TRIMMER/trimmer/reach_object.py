@@ -16,8 +16,25 @@ it wraps and reads FURTHER). Keep the object beyond MIN_RELIABLE_Z; readings
 below it are rejected. If the trimmer lands slightly off the top, nudge
 REACH_TRIM in trimmer_config.py — no re-teaching needed.
 
+CLICK any detected object to send the head there — from any phase, and it
+lifts out of the way first if it needs to. The click is never silent: it marks
+where you clicked and says on screen when there was nothing to pick.
+
+Every key acts ONCE per press. Holding o/l/k/j repeats, deliberately, because
+those are nudges you tune by feel. If nothing responds at all, click on the
+video window first — keys only reach the focused window.
+
+Once the head is on top of a patch it CUTS: a flat drop straight down through
+it, then a base-only sweep left and right. The head stays flat and the base
+axis is vertical, so the tip holds one height through the whole arc - a level
+cut with no kinematics to get wrong.
+
+There is also a memory of where it has already cut, so a trimmed patch is not
+found and cut again - but it is OFF by default (REMEMBER_CLEARED below), so
+right now every patch stays fair game however many times you hit it.
+
 Keys:  CLICK an object to reach it · SPACE reach the highlighted one ·
-       ENTER toggle auto ·
+       ENTER toggle auto · c cut now · x forget cleared areas ·
        o/l raise/lower the head (HEIGHT, shoulder) ·
        k/j tilt the head to keep it FLAT (wrist) ·
        p SAVE the current trim (persists across runs) ·
@@ -48,15 +65,64 @@ from trimmer_config import (
     CENTRE_GAIN, TRACK_ERR_SMOOTH, TRACK_MIN_CMD_INTERVAL_S,
     CENTRE_DEADBAND_PX, CENTRE_STABLE_FRAMES, CENTRE_SPEED, CENTRE_ACC,
     OBJECT_MIN_PROUD_M, OBJECT_MAX_AREA_PX, OBJECT_MIN_AREA_PX,
-    GRASS_MAX_PROUD_M, REACH_TRIM, HEIGHT_TRIM_STEP, APPROACH_HOVER_FRAC,
+    GRASS_MAX_PROUD_M, REACH_TRIM, HEIGHT_TRIM_STEP,
     REST_POSE, CUT_POINTS, REACH_TRIM_EDGE, EDGE_WRIST_OFFSET_RAW,
+    TRIM_SWEEP_HALF_RAW, TRIM_PASSES, TRIM_SWEEP_SPEED, TRIM_SWEEP_ACC,
 )
 from trimmer_arm import TrimmerArm, TrimmerError
 from trim_detector import build_pipeline, detect_patches
 
 ARM_JOINTS = (SHOULDER_ID, ELBOW_ID, WRIST_ID)
 _FONT = cv2.FONT_HERSHEY_SIMPLEX
-HOLD_S = 2.0            # how long to sit at the object top in auto mode
+HOLD_S = 1.0            # pause at the object top before cutting
+# --- the cut -----------------------------------------------------------------
+# How far the head drops THROUGH the patch once it has landed on top of it,
+# as a MAGNITUDE in raw ticks. The direction is not set here and must not be:
+# it is worked out from the arm's own geometry.
+#
+# The first version had it as a signed number and I picked the sign by
+# reasoning about which way the shoulder was wired. It was wrong, so the head
+# rose off the target instead of cutting into it. There is no need to guess:
+# the arm has just travelled from REST to sitting on top of the patch, and
+# that direction IS downward, by definition. Carrying on the same way is
+# further down whatever the wiring does.
+CUT_DROP_RAW = 120      # magnitude only - always a positive number
+CUT_DROP_SPEED = 260    # deliberate, not a stab
+CUT_DROP_ACC = 12
+# How far a click may land from a detection and still count. Generous on
+# purpose: the objects are small on screen and asking for pixel accuracy with
+# a mouse is the reason the old 90 px limit felt like the feature did nothing.
+CLICK_MAX_PX = 160
+
+# --- remembering what has been cut ------------------------------------------
+# OFF for now. When it is on, anywhere the head has cut is skipped for a few
+# minutes, which stops the loop re-finding a patch it has already trimmed -
+# a cut patch is shorter but still stands proud of the deck, so it comes
+# straight back. Worth turning on once the cut itself is dialled in; while
+# you are still tuning, being able to hit the same patch repeatedly is more
+# useful than the machine refusing to.
+REMEMBER_CLEARED = False
+
+
+_warned = {}
+
+
+def _warn_outside(z, edge, which):
+    """Say once per distance that the reach is being clamped, and by how much.
+
+    Once, not every frame: at camera rate this would bury everything else in
+    the log, and the point is to be noticed, not to shout.
+    """
+    key = (round(z, 2), which)
+    if key in _warned:
+        return
+    _warned[key] = True
+    print(f'[reach] target at {z:.3f} m is {which} than the taught table '
+          f'(edge {edge:.3f} m).')
+    print(f'        The pose is clamped to the end of the table, so the head '
+          f'will stop about {abs(z-edge)*100:.0f} cm short.')
+    print(f'        Fix by teaching a point out there: '
+          f'python trimmer/calibrate/calibrate_reach.py')
 
 
 def reach_arm_pose(z, table, base_trim, lock_angle=False):
@@ -70,10 +136,16 @@ def reach_arm_pose(z, table, base_trim, lock_angle=False):
     This keeps the head at one consistent orientation even when the taught
     poses were inconsistent (which hand-teaching a vertical angle usually is)."""
     pts = sorted(table, key=lambda p: p[0])
+    # Outside the taught range the pose is CLAMPED to the nearest end. That is
+    # the safe thing to do - extrapolating a hand-taught arm pose can drive the
+    # head into the table - but done silently it looks like the arm simply
+    # under-reaching by a fixed amount, with nothing to explain it. So say so.
     if z <= pts[0][0]:
         lo = hi = pts[0]; t = 0.0
+        _warn_outside(z, pts[0][0], 'nearer')
     elif z >= pts[-1][0]:
         lo = hi = pts[-1]; t = 0.0
+        _warn_outside(z, pts[-1][0], 'further')
     else:
         for a, b in zip(pts, pts[1:]):
             if a[0] <= z <= b[0]:
@@ -102,13 +174,6 @@ def reach_arm_pose(z, table, base_trim, lock_angle=False):
     return pose
 
 
-def hover_pose(full):
-    """Part-way from REST to the full reach pose — a safe approach, no lunge."""
-    return {sid: int(round(REST_POSE[sid]
-                           + APPROACH_HOVER_FRAC * (full[sid] - REST_POSE[sid])))
-            for sid in full}
-
-
 def main():
     edge = len(sys.argv) > 1 and sys.argv[1].lower() == 'edge'
     if REST_POSE is None or not CUT_POINTS:
@@ -117,6 +182,30 @@ def main():
     # BOTH modes use the flat CUT_POINTS table. EDGE just rotates the wrist 90
     # deg (so the trimmer stands vertical) and carries its own fine trim.
     table = CUT_POINTS
+    # Audit the table before anything moves. Both of the ways it can be wrong -
+    # a target outside the taught range, or a mis-taught point that makes the
+    # arm retract as the target recedes - are properties of the table itself,
+    # so there is no reason to discover them by watching the head miss.
+    import reach_table as _rt
+    _rt.report(table)
+    reach_stats = {'ok': 0, 'clamped': 0, 'reversed': 0, 'near': 0}
+    # where the head has already cut, so the same patch is not chased forever
+    from cleared import ClearedZones, base_for_detection
+    cleared = ClearedZones()
+    # Servo reads block for up to 80 ms each. Throttling them is what keeps
+    # the GUI event loop - and therefore the keyboard - alive.
+    _check_at = {}
+    _arrived_cache = False
+
+    def _due(what, now, every=0.25):
+        if now - _check_at.get(what, 0.0) < every:
+            return False
+        _check_at[what] = now
+        return True
+
+    cut_requested = False
+    cut_pose = None
+    sweep_seq, sweep_goal, sweep_centre = [], 0, 0
     if edge:
         save_base = dict(REACH_TRIM_EDGE)      # what 'p' saves (fine trim only)
         # effective offset = flat trim + 90deg wrist + edge fine trim
@@ -162,6 +251,8 @@ def main():
     # Live DELTAS on top of REACH_TRIM: shoulder = height, wrist = head angle.
     live_trim = {SHOULDER_ID: 0, WRIST_ID: 0}
     click = {'pt': None}
+    click_mark = None       # where the last click landed, for a moment
+    click_msg = None        # why a click did nothing, if it did nothing
     window = 'SO-101 Trimmer — reach to object top'
 
     def on_mouse(event, mx, my, flags, param):
@@ -170,6 +261,8 @@ def main():
 
     cv2.namedWindow(window)
     cv2.setMouseCallback(window, on_mouse)
+    from keys import Keys
+    kb = Keys()
 
     def log(m):
         print(f"[{time.monotonic():7.2f}] {m}")
@@ -229,13 +322,14 @@ def main():
                 if now - last_frame_t > 3.0:
                     log("CAMERA STOPPED (no frames 3s) — parking arm")
                     break
-                if cv2.waitKey(1) & 255 == ord('q'):
+                if kb.poll(1).hit(ord('q')):
                     break
                 continue
             last_frame_t = now
             image = group['rgb'].getCvFrame()
             depth = group['depth'].getFrame().astype(np.float32) / 1000.0
             try:
+                kb.pump()          # the read below blocks; keep keys alive
                 base_raw = arm.read_position(BASE_ID)
                 pos_hist.append((now, base_raw))
                 if len(pos_hist) > 40:
@@ -248,18 +342,53 @@ def main():
                                       min_area=OBJECT_MIN_AREA_PX,
                                       max_area=OBJECT_MAX_AREA_PX)
                        if phase in ('IDLE', 'CENTRE') else [])
+            # Drop anything sitting where the head has already cut. A patch
+            # that has just been trimmed is shorter but still stands proud of
+            # the deck, so without this the loop finds it again, cuts it
+            # again, and never reaches the second patch - which looks like the
+            # machine working and is actually it stuck.
+            if REMEMBER_CLEARED and patches and len(cleared):
+                kept, skipped = [], []
+                for p_ in patches:
+                    b = base_for_detection(p_['u'], base_raw, centre_x,
+                                           RAW_PER_PIXEL, BASE_DIRECTION_SIGN)
+                    p_['base_for'] = b
+                    (skipped if cleared.is_cleared(b, p_['z']) else kept).append(p_)
+                cleared_now = skipped
+                patches = kept
+            else:
+                cleared_now = []
             status = phase
 
-            # ---- click to select + engage a specific object ----
+            # ---- click to pick the target -------------------------------
+            # This worked only while IDLE and only within 90 px of a detection,
+            # and said nothing when it did neither - so a click during a reach,
+            # or a click slightly off the object, simply vanished and the
+            # feature felt broken. Now it works from any phase (lifting first
+            # if the arm is out), takes the nearest detection whatever the
+            # distance, and says so on screen when there is nothing to pick.
             if click['pt'] is not None:
                 mx, my = click['pt']
                 click['pt'] = None
-                if phase == 'IDLE' and patches:
+                click_mark = (mx, my, now)
+                if not patches:
+                    click_msg = ('nothing detected there - is the object '
+                                 'standing proud of the desk?', now)
+                else:
                     pick = min(patches, key=lambda p: (p['u'] - mx) ** 2
                                + (p['v'] - my) ** 2)
-                    if ((pick['u'] - mx) ** 2 + (pick['v'] - my) ** 2) ** 0.5 <= 90:
+                    d = ((pick['u'] - mx) ** 2 + (pick['v'] - my) ** 2) ** 0.5
+                    if d > CLICK_MAX_PX:
+                        click_msg = (f'nearest object is {d:.0f} px away - '
+                                     f'click closer to it', now)
+                    else:
+                        if phase != 'IDLE':
+                            lift_to_rest()
+                            phase, phase_start = 'IDLE', now
+                            log('clicked a new target - lifting first')
                         log(f"CLICK -> object at ({pick['u']},{pick['v']}) "
                             f"z={pick['z']:.3f}")
+                        target = pick
                         engage(pick)
 
             if phase == 'IDLE':
@@ -288,10 +417,19 @@ def main():
                         centre_ok += 1
                         if centre_ok >= CENTRE_STABLE_FRAMES:
                             full_pose = reach_arm_pose(cur['z'], table, base_trim)
+                            _ok, _short, _msg = _rt.verdict(cur['z'], table)
+                            if _ok:
+                                reach_stats['ok'] += 1
+                            elif _short:
+                                reach_stats['clamped'] += 1
+                            elif 'reversed' in _msg:
+                                reach_stats['reversed'] += 1
+                            else:
+                                reach_stats['near'] += 1
                             arm.set_profile(MOVE_SPEED, MOVE_ACC)
-                            arm.move_pose(hover_pose(apply_height(full_pose)))
-                            phase, phase_start = 'APPROACH', now
-                            log(f"APPROACH hover, z={cur['z']:.3f}")
+                            arm.move_pose(apply_height(full_pose))   # straight to the object top
+                            phase, phase_start = 'REACH', now
+                            log(f"REACH to object top: {apply_height(full_pose)}")
                     else:
                         centre_ok = 0
                         g = track_goal(present, err, now)
@@ -299,29 +437,123 @@ def main():
                             arm.move_to(BASE_ID, g)
                     status = f'CENTRING err={err:+d}px'
 
-            elif phase == 'APPROACH':
-                status = 'APPROACHING (hover)'
-                if arm.arrived(hover_pose(apply_height(full_pose)),
-                               tol=ARRIVE_TOL_RAW * 2) or now - phase_start > 2.5:
-                    arm.move_pose(apply_height(full_pose))   # to the object top
-                    phase, phase_start = 'REACH', now
-                    log(f"REACH to object top: {apply_height(full_pose)}")
-
             elif phase == 'REACH':
                 status = 'MOVING TO OBJECT TOP'
-                if arm.arrived(apply_height(full_pose), tol=ARRIVE_TOL_RAW * 2) \
-                        or now - phase_start > 3.0:
+                # arrived() reads EVERY joint - three blocking round trips at
+                # up to 80 ms each. Every frame, that is what starved the
+                # keyboard. Check a few times a second instead; the arm takes
+                # far longer than that to get anywhere.
+                kb.pump()
+                if _due('reach', now):
+                    _arrived_cache = arm.arrived(apply_height(full_pose),
+                                                 tol=ARRIVE_TOL_RAW * 2)
+                if _arrived_cache or now - phase_start > 3.0:
                     phase, phase_start = 'HOLD', now
                     log("AT OBJECT TOP")
 
             elif phase == 'HOLD':
                 status = (f"AT TOP — o/l height({live_trim[SHOULDER_ID]:+d}) "
-                          f"k/j flat({live_trim[WRIST_ID]:+d}) · r lift")
-                if auto and now - phase_start >= HOLD_S:
-                    lift_to_rest(); phase, phase_start = 'IDLE', now
-                    log("lift — next object")
+                          f"k/j flat({live_trim[WRIST_ID]:+d}) · "
+                          f"c CUT · r lift")
+                # Landing on top of the patch is only the aim. The cut is
+                # dropping through it and sweeping - so that happens next,
+                # rather than lifting straight back off.
+                if (auto or cut_requested) and now - phase_start >= HOLD_S:
+                    cut_requested = False
+                    # Keep going the way the arm was already going. REST is
+                    # up and clear; the reach pose is down on the target; so
+                    # the sign of (reach - rest) is "downward" for this arm,
+                    # measured rather than assumed.
+                    _here = apply_height(full_pose)
+                    _down = _here[SHOULDER_ID] - REST_POSE[SHOULDER_ID]
+                    _sign = 1 if _down >= 0 else -1
+                    cut_pose = dict(_here)
+                    cut_pose[SHOULDER_ID] += _sign * abs(CUT_DROP_RAW)
+                    arm.set_profile(CUT_DROP_SPEED, CUT_DROP_ACC)
+                    arm.move_pose(cut_pose)
+                    phase, phase_start = 'CUT', now
+                    log(f"CUT — dropping {_sign * abs(CUT_DROP_RAW):+d} raw "
+                        f"into the patch (down is {'+' if _sign > 0 else '-'} "
+                        f"on this arm)")
+
+            elif phase == 'CUT':
+                # Straight down, flat, into the grass. One move, then sweep.
+                status = 'CUTTING DOWN'
+                kb.pump()
+                if _due('cut', now):
+                    _arrived_cache = arm.arrived(cut_pose, tol=ARRIVE_TOL_RAW * 2)
+                if _arrived_cache or now - phase_start > 2.5:
+                    # The sweep moves ONLY the base. The head is flat and the
+                    # base axis is vertical, so the tip stays at one height
+                    # through the whole arc - a level cut with no kinematics
+                    # to get wrong. Same trick main_trimmer.py uses.
+                    b = arm.read_position(BASE_ID) or BASE_FORWARD_RAW
+                    sweep_centre = b
+                    sweep_seq = []
+                    for _ in range(TRIM_PASSES):
+                        sweep_seq += [b - TRIM_SWEEP_HALF_RAW,
+                                      b + TRIM_SWEEP_HALF_RAW]
+                    sweep_seq.append(b)          # finish back on centre
+                    arm.set_profile(TRIM_SWEEP_SPEED, TRIM_SWEEP_ACC,
+                                    ids=[BASE_ID])
+                    sweep_goal = sweep_seq.pop(0)
+                    arm.move_to(BASE_ID, sweep_goal)
+                    phase, phase_start = 'SWEEP', now
+                    log(f"SWEEP — {TRIM_PASSES} passes "
+                        f"+/-{TRIM_SWEEP_HALF_RAW} raw about {b}")
+
+            elif phase == 'SWEEP':
+                status = f'SWEEPING ({len(sweep_seq)} moves left)'
+                kb.pump()
+                here_raw = arm.read_position(BASE_ID)
+                if here_raw is not None and \
+                        abs(here_raw - sweep_goal) <= ARRIVE_TOL_RAW * 2:
+                    if sweep_seq:
+                        sweep_goal = sweep_seq.pop(0)
+                        arm.move_to(BASE_ID, sweep_goal)
+                    else:
+                        arm.set_profile(MOVE_SPEED, MOVE_ACC, ids=[BASE_ID])
+                        if REMEMBER_CLEARED and target is not None:
+                            cleared.mark(sweep_centre, target['z'])
+                            log(f"cleared — {cleared.summary()}")
+                        lift_to_rest()
+                        phase, phase_start = 'IDLE', now
+                        log("cut complete — lifting")
+                elif now - phase_start > 20.0:
+                    arm.set_profile(MOVE_SPEED, MOVE_ACC, ids=[BASE_ID])
+                    lift_to_rest()
+                    phase, phase_start = 'IDLE', now
+                    log("SWEEP watchdog — lifting")
 
             # ---- overlay ----
+            # Say on screen whether the table can actually reach the selected
+            # target. This is the one number that explains a consistent miss,
+            # and it was previously invisible until someone measured the gap
+            # with a ruler.
+            if target is not None:
+                _ok, _short, _msg = _rt.verdict(target['z'], table)
+                if not _ok:
+                    _t = (f"TARGET {target['z']:.3f} m - {_msg}"
+                          + (f", the head will stop {_short:.0f} cm short"
+                             if _short else ''))
+                    cv2.rectangle(image, (0, image.shape[0] - 30),
+                                  (image.shape[1], image.shape[0]), (0, 0, 90), -1)
+                    cv2.putText(image, _t, (8, image.shape[0] - 10),
+                                cv2.FONT_HERSHEY_SIMPLEX, 0.46, (90, 160, 255), 1)
+
+            # show where a click landed, and why it did nothing if it did
+            if click_mark is not None and now - click_mark[2] < 1.0:
+                cv2.drawMarker(image, (click_mark[0], click_mark[1]),
+                               (255, 220, 90), cv2.MARKER_CROSS, 22, 2)
+            if click_msg is not None and now - click_msg[1] < 2.0:
+                cv2.putText(image, click_msg[0], (10, image.shape[0] - 40),
+                            _FONT, 0.5, (90, 200, 255), 1, cv2.LINE_AA)
+
+            for p in cleared_now:
+                x, y, w, h = p['bbox']
+                cv2.rectangle(image, (x, y), (x + w, y + h), (120, 120, 120), 1)
+                cv2.putText(image, 'cleared', (x, max(12, y - 5)),
+                            _FONT, 0.42, (150, 150, 150), 1)
             for p in patches:
                 x, y, w, h = p['bbox']
                 sel = target is not None and p is target
@@ -337,39 +569,49 @@ def main():
                         (0, 255, 255), 2)
             cv2.imshow(window, image)
 
-            key = cv2.waitKey(1) & 255
-            if key == ord('q'):
+            # ONE press, ONE action. cv2.waitKey reports which key is DOWN, not
+            # when it was pressed, so acting on the value acted repeatedly while
+            # a key was held - one tap of ENTER used to toggle auto several
+            # times. keys.Keys watches for the transition instead. The trims
+            # still repeat when held, deliberately, because nudging by feel is
+            # what they are for.
+            kb.poll(1)
+            key = kb.key
+            if kb.hit(ord('q')):
                 break
-            if key == ord(' ') and phase == 'IDLE' and target is not None \
-                    and now - last_key > 0.3:
-                last_key = now
+            if kb.hit(ord(' ')) and phase == 'IDLE' and target is not None:
                 engage(target)
-            if key in (13, 10) and now - last_key > 0.3:
-                last_key = now
+            if kb.hit(13, 10):
                 auto = not auto
                 log(f"AUTO {'ON' if auto else 'OFF'}")
-            if key == ord('r') and phase in ('APPROACH', 'REACH', 'HOLD'):
+            if kb.hit(ord('c')) and phase == 'HOLD':
+                cut_requested = True
+                log('cut requested')
+            if kb.hit(ord('x')):
+                n = cleared.forget_all()
+                log(f'forgot {n} cleared area(s) - all fair game again')
+            if kb.hit(ord('r')) and phase in ('REACH', 'HOLD'):
                 lift_to_rest(); phase, phase_start = 'IDLE', now
                 log("lifted to REST")
             # live tuning: o/l = HEIGHT (shoulder), k/j = head ANGLE (wrist).
             _tuned = None
-            if key == ord('o'):
+            if kb.tap(ord('o')):
                 live_trim[SHOULDER_ID] += HEIGHT_TRIM_STEP; _tuned = SHOULDER_ID
-            elif key == ord('l'):
+            elif kb.tap(ord('l')):
                 live_trim[SHOULDER_ID] -= HEIGHT_TRIM_STEP; _tuned = SHOULDER_ID
-            elif key == ord('k'):
+            elif kb.tap(ord('k')):
                 live_trim[WRIST_ID] += HEIGHT_TRIM_STEP; _tuned = WRIST_ID
-            elif key == ord('j'):
+            elif kb.tap(ord('j')):
                 live_trim[WRIST_ID] -= HEIGHT_TRIM_STEP; _tuned = WRIST_ID
             if _tuned is not None and full_pose is not None \
-                    and phase in ('APPROACH', 'REACH', 'HOLD'):
+                    and phase in ('REACH', 'HOLD'):
                 arm.move_pose(apply_height(full_pose))
                 cfg2 = save_base.get(SHOULDER_ID, 0) + live_trim[SHOULDER_ID]
                 cfg4 = save_base.get(WRIST_ID, 0) + live_trim[WRIST_ID]
                 log(f"trim shoulder{live_trim[SHOULDER_ID]:+d} "
                     f"wrist{live_trim[WRIST_ID]:+d}  ->  {save_var} = "
                     f"{{2: {cfg2}, 3: 0, 4: {cfg4}}}  (press p to save)")
-            if key == ord('p'):
+            if kb.hit(ord('p')):
                 c2 = save_base.get(SHOULDER_ID, 0) + live_trim[SHOULDER_ID]
                 c3 = save_base.get(ELBOW_ID, 0)
                 c4 = save_base.get(WRIST_ID, 0) + live_trim[WRIST_ID]
@@ -381,9 +623,21 @@ def main():
                     f.write(f"{save_var} = {{2: {c2}, 3: {c3}, 4: {c4}}}\n")
                 log(f"SAVED {save_var} = {{2: {c2}, 3: {c3}, 4: {c4}}} "
                     f"-> {persist_name} (persists next run)")
-            if key == ord('e'):
+            if kb.hit(ord('e')):
                 arm.emergency_stop(); log("E-STOP"); break
     finally:
+        # A session summary, because a systematic miss is obvious in the
+        # aggregate and easy to shrug off one reach at a time.
+        _n = sum(reach_stats.values())
+        if _n:
+            print(f'\n[reach] {_n} reach(es): {reach_stats["ok"]} inside the '
+                  f'taught range, {reach_stats["clamped"]} clamped beyond it, '
+                  f'{reach_stats["reversed"]} in a reversed segment, '
+                  f'{reach_stats["near"]} too near.')
+            if reach_stats['ok'] < _n:
+                print('[reach] every one of those will have landed short. '
+                      'Re-teach the table:')
+                print('        python trimmer/calibrate/calibrate_reach.py')
         try:
             arm.set_profile(MOVE_SPEED, MOVE_ACC)
             arm.move_pose(REST_POSE)

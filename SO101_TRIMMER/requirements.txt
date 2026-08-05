@@ -1,0 +1,29 @@
+# What the running system needs.
+#     pip install -r requirements.txt
+
+# --- required ---------------------------------------------------------------
+numpy
+opencv-python          # cv2: detection, the windows, the drawing
+depthai                # the OAK-D
+pyserial               # the SO-101 servo bus
+streamlit              # the dashboard
+
+# --- strongly recommended ---------------------------------------------------
+# Without onnxruntime the detector falls back to cv2.dnn, which works but is
+# several times slower - and it is the slowest thing in the loop. It has no
+# wheel for Python 3.14 yet, which is the single best reason to run this on
+# 3.11 or 3.12 rather than on Thonny's bundled interpreter.
+onnxruntime
+pandas                 # the dashboard's tables
+
+# --- only for the CAD ------------------------------------------------------
+# trimesh needs manifold3d for the boolean operations; without it
+# cad/trimmer_head.py cannot subtract the holes.
+trimesh
+manifold3d
+
+# --- only for training, and normally done in Colab instead -----------------
+# ultralytics
+# torch
+# torchvision
+# pillow

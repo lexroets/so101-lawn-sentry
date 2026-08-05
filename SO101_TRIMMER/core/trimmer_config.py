@@ -33,7 +33,45 @@ BASE_ID = 1
 SHOULDER_ID = 2
 ELBOW_ID = 3
 WRIST_ID = 4
-JOINT_IDS = (BASE_ID, SHOULDER_ID, ELBOW_ID, WRIST_ID)
+# The joint the trimmer HEAD is bolted to - wrist roll. It sets which way the
+# cutting plane faces, which is the whole difference between mowing a top and
+# edging a side, so it cannot stay unconfigured.
+HEAD_ID = 5
+
+# The four that must be there for the arm to be usable at all. The head is
+# listed separately because it is a later addition: a rig without it should
+# still run rather than refusing to start.
+# --- head joint travel -------------------------------------------------------
+# The head does NOT have a normal min/max. Its travel is an arc that runs
+# through the encoder's zero:
+#
+#     1000  ....  anticlockwise limit
+#       |         counts DOWN
+#       0 / 4095  flat - the trimmer head's rest orientation, on the wrap
+#       |         counts DOWN
+#     3000  ....  clockwise limit
+#
+# So the ALLOWED values are  0..1000  and  3000..4095,
+# and 1001..2999 - the part containing 2048 - is the FORBIDDEN half where the
+# head is at a dangerous angle and the cable gets wound.
+#
+# Written as a plain range this is nonsense: min=3000, max=1000 is empty, and
+# 0..4095 permits the forbidden half. Everything therefore works in ARC
+# COORDINATES (see pathplay.to_arc), counting from the clockwise limit up
+# through the wrap to the anticlockwise one, where it is a plain interval.
+HEAD_ARC_LO = 1000          # clockwise limit; arc counts UP from here...
+HEAD_ARC_HI = 3100          # ...through 4095/0, to the anticlockwise limit
+HEAD_FLAT_RAW = 2048           # flat, on the wrap, mid-arc
+
+# Crossing the wrap IS allowed, because each step is commanded and then read
+# back to confirm the servo went the short way - see pathplay.step_head.
+HEAD_ALLOW_WRAP_CROSSING = True
+
+HEAD_MAX_STEP_RAW = 1200    # about 105 degrees in one waypoint
+
+REQUIRED_IDS = (BASE_ID, SHOULDER_ID, ELBOW_ID, WRIST_ID)
+OPTIONAL_IDS = (HEAD_ID,)
+JOINT_IDS = REQUIRED_IDS + OPTIONAL_IDS
 
 # --- motion profiles -------------------------------------------------------
 # GENTLER than the battery arm: the trimmer adds mass and leverage at the
@@ -114,8 +152,15 @@ OBJECT_MAX_AREA_PX = 40000
 # The shoulder is the real height lever; the wrist only sets the head angle.
 REACH_TRIM = {2: 0, 3: 0, 4: 0}
 HEIGHT_TRIM_STEP = 10          # raw per keypress for live trimming
-APPROACH_HOVER_FRAC = 0.6      # go to this fraction of the descent first
-                               # (a safe hover), then the rest — no lunging.
+
+# The head angle that suits APPROACHING a patch is not the angle that suits
+# CUTTING it. Reaching, the head is level and hovering on top; cutting, it has
+# dropped through the grass and the geometry has changed, so the same wrist
+# value leaves it skewed. This offset applies ONLY once the cut starts, on top
+# of REACH_TRIM, and is tuned live with [ and ] and saved with p.
+CUT_WRIST_TRIM = 0
+CUT_WRIST_STEP = 8             # raw per keypress - finer than the height step,
+                               # because head angle is the fussier of the two
 
 # --- base centring on a patch (PD tracker, smoothed + rate-limited) --------
 CENTRE_GAIN = 0.9             # proportional gain on the smoothed pixel error
@@ -190,3 +235,115 @@ except ImportError:
 # rather than in either project. Used only as a fallback: camera_intrinsics
 # asks the device for its factory calibration first.
 CAMERA_HFOV_DEG = 69.0        # OAK-D Lite RGB horizontal field of view
+
+
+# --- travelling between paths ------------------------------------------------
+# The move from the end of the top pass to the start of a side pass is a
+# TRAVEL move, not a cut. Interpolated straight it goes through the box,
+# because a straight line in joint space between two points either side of an
+# obstacle does not care that the obstacle is there.
+#
+# So a travel move arcs: the shoulder opens on the way across and closes again
+# on arrival, peaking in the middle. Both ends are untouched, so it still
+# starts and finishes exactly on the taught poses.
+TRAVEL_LIFT_RAW = 220        # about 19 deg of extra clearance at the peak
+TRAVEL_LIFT_MIN_RAW = 350    # only arc when the move is at least this big
+
+
+# --- holding the head flat ---------------------------------------------------
+# On this arm the shoulder, elbow and wrist all pitch about parallel axes, so
+# the head's angle to the ground is their SUM and nothing else. Measured on the
+# taught top pass, that sum varies by 215 raw - 18.9 degrees of the head
+# tipping about while the pass is cut, which is the fluctuation that looks bad.
+#
+# It does not have to be taught at all. Fix the sum and the wrist follows from
+# the other two: wrist = target - shoulder - elbow. The head is then flat
+# everywhere by construction, and one fewer thing has to be got right by hand.
+#
+# Only the TOP pass by default. The side pass legitimately changes pitch as it
+# works down the face - levelling it would need 556 raw of wrist, which is a
+# different motion, not a tidy-up. Add 'side_1' here if you want it anyway.
+LEVEL_PITCH_PATHS = ('top',)
+LEVEL_PITCH_TARGET = {}     # path -> sum; absent means "median of that pass"
+LEVEL_PITCH_TRIM = 0        # nudge the locked angle, raw (+ tips one way)
+
+
+# --- cutting at ONE height ---------------------------------------------------
+# With the pitch locked, the head's height above the table depends only on the
+# shoulder and the elbow - the base just points the arm, it does not raise or
+# lower it. So "hold one cutting plane" is a single curve through
+# (shoulder, elbow), and every pose on that curve is at the same height.
+#
+# A pass dragged by hand does not sit on that curve; it scatters either side of
+# it. Measured on the taught top pass the scatter is 135 raw of elbow, and that
+# scatter IS the uneven cut. Fitting the curve and putting every waypoint back
+# onto it makes the height constant by construction.
+#
+# The fit is checked before it is used: if the taught pass does not describe a
+# consistent plane the correction is refused rather than applied blind.
+LEVEL_HEIGHT_PATHS = ('top',)
+LEVEL_HEIGHT_DEGREE = 2      # quadratic; the locus is smooth over this range
+# -133 keeps the AVERAGE height that was taught and only removes the
+# unevenness. Set to 0 to cut on the surface that was actually touched -
+# but the taught pass sits 133 raw of elbow away from it, so that is a
+# real move, not a tidy-up. Change it in steps and watch.
+LEVEL_HEIGHT_TRIM = -133
+LEVEL_HEIGHT_MAX_FIX = 200
+# Over how much shoulder travel the correction fades to nothing at the
+# edge of the calibrated range, so the uncalibrated ends of a pass join
+# the levelled middle smoothly instead of stepping into it.
+LEVEL_HEIGHT_FADE_RAW = 150   # refuse if any waypoint needs more than this
+
+
+# --- the arm's real geometry -------------------------------------------------
+# From the published SO-101 URDF (TheRobotStudio/SO-ARM100, so101_new_calib),
+# NOT fitted. Fitting the lengths from touch points looked reasonable and came
+# out 42% wrong on the ratio - and the level curve of the wrong arm is not the
+# level curve of this one, which is why a tilt survived every correction.
+#
+# These two are the STOCK part of the arm - shoulder to elbow, elbow to wrist
+# pitch. Everything past the wrist pitch is modified on this rig and is NOT
+# used here: with the head's pitch locked, its vertical contribution is a
+# constant, and holding a constant height does not care about constants.
+ARM_L1_M = 0.1160        # shoulder_lift -> elbow_flex
+ARM_L2_M = 0.1350        # elbow_flex    -> wrist_flex
+
+# The cut height, in MILLIMETRES above the plane taught in level_plane.py.
+# It used to be in elbow ticks, which was a mistake: a fixed elbow offset is
+# not a fixed height, so the units themselves introduced a tilt.
+# 25 mm is the average height the pass was ALREADY cutting at, so this
+# changes the evenness without changing the height. Lower it to cut
+# closer, raise it to cut higher - it is millimetres now, so it means
+# what it says at every reach.
+LEVEL_HEIGHT_TRIM_MM = 0.0
+
+# Lower the CLOSE end of the sweep by this much, fading to nothing at the far
+# end. The plane the arm cuts and the plane the work actually sits on are not
+# always the same: the box may not be level, the table may not be, or the head
+# may load differently folded in than stretched out. Rather than re-teach the
+# plane to absorb that, tilt the cut.
+#
+# Positive lowers the near rows. The far end is left exactly where
+# LEVEL_HEIGHT_TRIM_MM puts it, so a sweep that is already right at the far
+# end stays right.
+LEVEL_HEIGHT_NEAR_DROP_MM = 0.0
+
+# ...and the same for the FAR end. Two independent ends rather than one tilt,
+# because in practice only one of them is ever wrong: whichever end is right
+# should not move while the other is being fixed.
+LEVEL_HEIGHT_FAR_DROP_MM = 0.0
+
+
+# Subtract the overshoot measured by trimmer/check_level.py. The arm droops
+# under gravity and sticks against friction, and neither can be predicted from
+# the pose - but both repeat, to 0.2 mm across two measured runs, so they can
+# simply be measured and taken off the command.
+SAG_COMPENSATE = True
+
+# Learn automatically. After a path is played in run_box, the arm walks it
+# again a pose at a time, reads where it actually landed, and folds the
+# difference into the correction - so every run is closer than the last with
+# nothing to remember to do. The learning walk is slower than the pass and
+# only happens when this is on.
+AUTO_LEARN = False
+AUTO_LEARN_PASSES = 1        # learning walks per play; it stops early anyway

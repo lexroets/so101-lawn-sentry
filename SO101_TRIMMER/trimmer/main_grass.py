@@ -37,7 +37,7 @@ from trimmer_arm import TrimmerArm, TrimmerError
 from trim_detector import build_pipeline
 from grass_detector import GrassDetector
 from camera_session import CameraSession
-from reach_object import reach_arm_pose, hover_pose
+from reach_object import reach_arm_pose
 
 _FONT = cv2.FONT_HERSHEY_SIMPLEX
 
@@ -78,7 +78,6 @@ def main():
     trim_seq, trim_goal = [], None
     trk = {'es': None, 'cmd_t': 0.0}
     pos_hist = []
-    last_key = 0.0
     window = 'SO-101 Autonomous Grass Trimmer'
 
     def log(m):
@@ -113,6 +112,8 @@ def main():
         log(f"CENTRE on grass z={tgt['z']:.3f} area={tgt['area']:.0f} "
             f"score={tgt['score']:.2f}")
 
+    from keys import Keys
+    kb = Keys()
     try:
         while True:                      # runs through camera restarts
             now = time.monotonic()
@@ -128,7 +129,7 @@ def main():
                     if not cam.restart():
                         log("camera restart failed — exiting")
                         break
-                if cv2.waitKey(1) & 255 == ord('q'):
+                if kb.poll(1).hit(ord('q')):
                     break
                 continue
             image = group['rgb'].getCvFrame()
@@ -172,7 +173,7 @@ def main():
                             full_pose = reach_arm_pose(cur['z'], CUT_POINTS,
                                                        REACH_TRIM)
                             arm.set_profile(MOVE_SPEED, MOVE_ACC)
-                            arm.move_pose(hover_pose(full_pose))
+                            arm.move_pose(full_pose)   # straight to the level-cut pose
                             phase, phase_start = 'LOWER', now
                             log(f"LOWER to level cut z={cur['z']:.3f}")
                     else:
@@ -184,9 +185,6 @@ def main():
 
             elif phase == 'LOWER':
                 status = 'LOWERING trimmer'
-                if arm.arrived(hover_pose(full_pose), tol=ARRIVE_TOL_RAW * 2) \
-                        or now - phase_start > 2.0:
-                    arm.move_pose(full_pose)
                 if arm.arrived(full_pose, tol=ARRIVE_TOL_RAW * 2) \
                         or now - phase_start > 3.5:
                     b = base_centre
@@ -232,15 +230,15 @@ def main():
                         0.55, (0, 255, 255), 2)
             cv2.imshow(window, image)
 
-            key = cv2.waitKey(1) & 255
-            if key == ord('q'):
+            kb.poll(1)
+            key = kb.key
+            if kb.hit(ord('q')):
                 break
-            if key in (13, 10) and now - last_key > 0.4:
-                last_key = now; auto = not auto; log(f"AUTO {'ON' if auto else 'OFF'}")
-            if key == ord(' ') and phase == 'IDLE' and target is not None \
-                    and now - last_key > 0.3:
-                last_key = now; engage(target)
-            if key == ord('e'):
+            if kb.hit(13, 10):
+                auto = not auto; log(f"AUTO {'ON' if auto else 'OFF'}")
+            if kb.hit(ord(' ')) and phase == 'IDLE' and target is not None:
+                engage(target)
+            if kb.hit(ord('e')):
                 arm.emergency_stop(); log("E-STOP"); break
     finally:
         try:

@@ -30,3 +30,8 @@ Thumbs.db
 _backup/
 SO101_ACTIVE/debug_log.txt
 runs/
+
+# ---- editor and scratch ----
+.claude/
+.vscode/
+*.invalid

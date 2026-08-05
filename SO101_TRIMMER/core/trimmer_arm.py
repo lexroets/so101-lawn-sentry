@@ -20,10 +20,20 @@ import time
 import serial
 
 from trimmer_config import (
-    SERIAL_PORT, BAUD_RATE, JOINT_IDS, BASE_ID,
+    SERIAL_PORT, BAUD_RATE, JOINT_IDS, BASE_ID, REQUIRED_IDS,
     MOVE_SPEED, MOVE_ACC, BASE_RAW_MIN, BASE_RAW_MAX,
     JOINT_RAW_MIN, JOINT_RAW_MAX, ARRIVE_TOL_RAW, ARRIVE_TIMEOUT_S,
 )
+
+# EEPROM. 0 = position (what a joint needs), 1 = wheel / constant speed.
+# In WHEEL mode the "goal speed" register stops being a speed LIMIT and
+# becomes a speed COMMAND, so setting a motion profile makes the servo turn
+# continuously instead of holding an angle. That is exactly what a joint stuck
+# in the wrong mode looks like: endless rotation, ignoring every position sent.
+REG_MODE = 33
+REG_LOCK = 55          # 0 unlocks EEPROM for writing, 1 locks it again
+MODE_POSITION = 0
+MODE_WHEEL = 1
 
 REG_TORQUE_ENABLE = 40
 REG_GOAL_ACC = 41
@@ -50,13 +60,44 @@ class TrimmerArm:
                 f"no other program has the port open. ({exc})") from exc
         time.sleep(0.1)
         self.port.reset_input_buffer()
+        # Probe them all, but only INSIST on the ones the arm cannot work
+        # without. The head joint was added later than the rest, so a rig
+        # without it should still run - refusing to open the port because an
+        # optional servo is absent makes every other tool unusable too.
+        present, missing = [], []
         for sid in self.ids:
-            if not self._ping(sid):
-                self.port.close()
-                raise TrimmerError(
-                    f"no response from servo id {sid} — check arm power/wiring. "
-                    f"(Joints 5/6 are expected to be GONE; JOINT_IDS={JOINT_IDS})")
+            (present if self._ping(sid) else missing).append(sid)
+        need = [sid for sid in REQUIRED_IDS if sid in missing]
+        if need:
+            self.port.close()
+            raise TrimmerError(
+                f"no response from servo id(s) {need} — check arm power and "
+                f"wiring. These are required; the arm cannot run without them.")
+        if missing:
+            print(f"[arm] servo(s) {missing} did not answer - carrying on "
+                  f"without them. If the trimmer head joint is one of these, "
+                  f"check its cable.")
+        self.ids = tuple(present)
+        # A joint in wheel mode will spin forever the moment a motion profile
+        # is written to it, so check before writing one and skip it if so.
+        self.wheel_mode = []
         for sid in self.ids:
+            if self.read_mode(sid) == MODE_WHEEL:
+                self.wheel_mode.append(sid)
+        if self.wheel_mode:
+            for sid in self.wheel_mode:
+                try:                       # stop it before it starts
+                    self._write(sid, REG_GOAL_SPEED, [0, 0])
+                except TrimmerError:
+                    pass
+            print(f"[arm] servo(s) {self.wheel_mode} are in WHEEL mode, not "
+                  f"position mode.")
+            print( "      They will rotate continuously instead of holding an "
+                   "angle. Fix once with:")
+            print(f"          python tools/fix_servo_mode.py {self.wheel_mode[0]}")
+        for sid in self.ids:
+            if sid in self.wheel_mode:
+                continue
             self._set_profile(sid, MOVE_SPEED, MOVE_ACC)
         self.start_pose = {sid: self.read_position(sid) for sid in self.ids}
 
@@ -108,6 +149,30 @@ class TrimmerArm:
             self._set_profile(sid, speed, acc)
 
     # -- feedback ------------------------------------------------------------
+    def read_mode(self, sid):
+        """0 = position, 1 = wheel. None if it cannot be read."""
+        try:
+            vals = self._read(sid, REG_MODE, 1)
+            return int(vals[0]) if vals else None
+        except TrimmerError:
+            return None
+
+    def set_mode(self, sid, mode=MODE_POSITION):
+        """Put a servo into position or wheel mode.
+
+        This writes EEPROM, which has to be unlocked first and locked after -
+        and unlike a position command it persists across power cycles, which
+        is why it is never done automatically at startup. Wrong mode is a
+        wiring-level fault: it should be fixed once, deliberately.
+        """
+        self._write(sid, REG_LOCK, [0])
+        time.sleep(0.02)
+        self._write(sid, REG_MODE, [int(mode) & 0xFF])
+        time.sleep(0.02)
+        self._write(sid, REG_LOCK, [1])
+        time.sleep(0.05)
+        return self.read_mode(sid)
+
     def read_position(self, sid):
         lo, hi = self._read(sid, REG_PRESENT_POSITION, 2)
         pos = lo | (hi << 8)
@@ -130,6 +195,20 @@ class TrimmerArm:
         self.torque_on = False
         for sid in self.ids:
             self._write(sid, REG_TORQUE_ENABLE, [0])
+
+    def hold(self, sids):
+        """Torque ON for just these joints, leaving the rest free."""
+        if self.stop_latched:
+            raise TrimmerError("cannot enable: emergency stop latched")
+        for sid in sids:
+            if sid in self.ids:
+                self._write(sid, REG_TORQUE_ENABLE, [1])
+
+    def release(self, sids):
+        """Torque OFF for just these joints."""
+        for sid in sids:
+            if sid in self.ids:
+                self._write(sid, REG_TORQUE_ENABLE, [0])
 
     def emergency_stop(self):
         self.stop_latched = True
